@@ -74,13 +74,6 @@ const CHO_STROKES: Record<number, number> = {
 const JUNG_STROKES = [2, 4, 3, 2, 4, 3, 4, 3, 2, 4, 3, 2, 3, 4, 3, 2, 4, 3, 4, 3, 2];
 const JONG_STROKES = [0, 2, 3, 3, 4, 4, 4, 5, 6, 7, 8, 9, 4, 5, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 
-const GRADES: { max: number; grade: FortuneGrade }[] = [
-  { max: 15, grade: "대길" },
-  { max: 35, grade: "길" },
-  { max: 55, grade: "보통" },
-  { max: 999, grade: "주의" },
-];
-
 const OHENG_ORDER: Oheng[] = ["목", "화", "토", "금", "수"];
 
 const PERSONALITY: Record<Oheng, string> = {
@@ -165,7 +158,6 @@ export function analyzeName(rawName: string): NameAnalysis {
   }
 
   const syllables: SyllableAnalysis[] = [];
-  let totalStrokes = 0;
 
   for (const char of name) {
     const parts = decomposeHangul(char);
@@ -174,7 +166,6 @@ export function analyzeName(rawName: string): NameAnalysis {
     const strokes =
       CHO_STROKES[parts.cho] + JUNG_STROKES[parts.jung] + JONG_STROKES[parts.jong];
     const oheng = CHO_TO_OHENG[parts.cho];
-    totalStrokes += strokes;
 
     syllables.push({
       char,

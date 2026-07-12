@@ -15,14 +15,29 @@ declare global {
   }
 }
 
-function loadAdSenseScript(client: string) {
-  if (document.querySelector(`script[data-adsense-client="${client}"]`)) return;
-  const s = document.createElement("script");
-  s.async = true;
-  s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
-  s.crossOrigin = "anonymous";
-  s.setAttribute("data-adsense-client", client);
-  document.head.appendChild(s);
+function loadAdSenseScript(client: string): Promise<void> {
+  const existing = document.querySelector(`script[data-adsense-client="${client}"]`);
+  if (existing) {
+    return existing.getAttribute("data-loaded") === "1"
+      ? Promise.resolve()
+      : new Promise((resolve) => {
+          existing.addEventListener("load", () => resolve(), { once: true });
+        });
+  }
+
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
+    s.crossOrigin = "anonymous";
+    s.setAttribute("data-adsense-client", client);
+    s.onload = () => {
+      s.setAttribute("data-loaded", "1");
+      resolve();
+    };
+    s.onerror = () => reject(new Error("AdSense script load failed"));
+    document.head.appendChild(s);
+  });
 }
 
 export default function AdSlot({ slotId, format = "auto", className = "" }: Props) {
@@ -31,13 +46,25 @@ export default function AdSlot({ slotId, format = "auto", className = "" }: Prop
 
   useEffect(() => {
     if (!client || !slotId || pushed.current) return;
-    loadAdSenseScript(client);
-    pushed.current = true;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch {
-      /* ignore ad block */
-    }
+    let cancelled = false;
+
+    loadAdSenseScript(client)
+      .then(() => {
+        if (cancelled || pushed.current) return;
+        pushed.current = true;
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch {
+          /* ignore ad block */
+        }
+      })
+      .catch(() => {
+        /* ignore load failure */
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [client, slotId]);
 
   if (!client || !slotId) return null;

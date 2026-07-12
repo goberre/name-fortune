@@ -4,7 +4,13 @@ import { motion } from "framer-motion";
 import GuaFrame from "@/components/musok/GuaFrame";
 import { INTRO_MUSOK, MUSOK_MOTTO } from "@/lib/musok-copy";
 
-export default function IntroMusok({ onEnter }: { onEnter: () => void }) {
+export default function IntroMusok({
+  onEnter,
+  onEnterCouple,
+}: {
+  onEnter: () => void;
+  onEnterCouple?: () => void;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -52,6 +58,18 @@ export default function IntroMusok({ onEnter }: { onEnter: () => void }) {
         >
           명통 열기
         </motion.button>
+        {onEnterCouple && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.95, duration: 0.4 }}
+            onClick={onEnterCouple}
+            className="mk-btn mk-btn-ghost mt-4 px-10"
+          >
+            배우자 궁합(雙通) 바로 보기
+          </motion.button>
+        )}
       </motion.div>
     </motion.div>
   );

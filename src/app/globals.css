@@ -26,7 +26,7 @@ body {
 
 .font-musok,
 .mk-body .font-musok {
-  font-family: "Noto Serif KR", "Batang", "Apple SD Gothic Neo", serif;
+  font-family: var(--font-noto-serif-kr), "Batang", "Apple SD Gothic Neo", serif;
 }
 
 /* ═══ 한국 전통 무속 미니멀 ═══ */
@@ -202,7 +202,7 @@ body {
 }
 
 .font-occult {
-  font-family: "Noto Serif KR", Georgia, serif;
+  font-family: var(--font-noto-serif-kr), Georgia, serif;
 }
 
 /* legacy occult / apple — below */

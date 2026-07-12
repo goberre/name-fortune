@@ -109,7 +109,7 @@ function placeHarmonyScore(a: SeongmyungResult, b: SeongmyungResult): number {
   const lngB = b.sajuProfile?.regionLng;
   const oA = a.sajuProfile?.regionOheng;
   const oB = b.sajuProfile?.regionOheng;
-  if (!latA || !lngA || !latB || !lngB || !oA || !oB) return 60;
+  if (latA == null || lngA == null || latB == null || lngB == null || !oA || !oB) return 60;
   let score = 58;
   const rel = ohengRelation(oA, oB);
   score += relationScore(rel) * 0.25;
@@ -315,7 +315,7 @@ export function analyzeCoupleCompatibility(input: {
 
   const crossHarmonySummary =
     crossScore >= 75
-      ? `「${personA.name}」한자가 ${personB.name} 사주를, 「${personB.name}」한자가 ${personA.name} 사주를 ${crossScore}점 수준으로 보완합니다.`
+      ? `「${personA.name}」 한자가 ${personB.name} 사주를, 「${personB.name}」 한자가 ${personA.name} 사주를 ${crossScore}점 수준으로 보완합니다.`
       : `이름↔상대 사주 교차 조화 ${crossScore}점 — 한쪽 또는 양쪽 이름이 상대 부족 오행을 직접 채우지 못할 수 있습니다.`;
 
   const nameBridgeSummary = `${personA.name} 발음 끝(${personA.pronunciationFlow.at(-1) ?? ""}행) → ${personB.name} 발음 시작(${personB.pronunciationFlow[0] ?? ""}행): ${relationLabel(ohengRelation(personA.pronunciationFlow.at(-1) ?? "토", personB.pronunciationFlow[0] ?? "토"))}.`;

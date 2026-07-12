@@ -41,8 +41,7 @@ export default function BirthLocationPicker({
   function onCityChange(cityId: string) {
     setBirthCity(cityId);
     setQuery("");
-    const list = getDistrictsByCity(cityId);
-    setBirthDistrict(list[0]?.id ?? "");
+    setBirthDistrict("");
   }
 
   return (
@@ -102,6 +101,11 @@ export default function BirthLocationPicker({
           <p className="font-musok text-sm text-[var(--mk-ivory)]">
             {BIRTH_CITIES.find((c) => c.id === selected.cityId)?.label} {selected.label}
           </p>
+          {selected.cityId === "overseas" && (
+            <p className="mt-2 text-[10px] text-amber-200/70">
+              해외·기타는 참고용 좌표(서울 기준)로 지기를 반영합니다.
+            </p>
+          )}
           <p className="mt-2 font-mono text-xs text-[var(--mk-cinnabar-soft)]">
             {formatCoordinates(selected.lat, selected.lng)}
           </p>

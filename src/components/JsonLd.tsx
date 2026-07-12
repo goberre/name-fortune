@@ -13,6 +13,14 @@ export default function JsonLd() {
         url: brandUrls.hub,
       },
       {
+        "@type": "WebSite",
+        "@id": `${brandUrls.hub}/#website`,
+        name: siteConfig.name,
+        url: brandUrls.hub,
+        publisher: { "@id": `${brandUrls.hub}/#organization` },
+        inLanguage: "ko-KR",
+      },
+      {
         "@type": "WebApplication",
         name: siteConfig.name,
         url: siteConfig.url,

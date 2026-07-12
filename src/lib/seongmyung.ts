@@ -4,6 +4,7 @@ import type { SajuOhengProfile, SourceOhengHarmony } from "@/lib/saju";
 import { analyzeSajuOheng, analyzeSourceOhengHarmony } from "@/lib/saju";
 import { analyzeBirthRegionHarmony, type BirthRegionAnalysis } from "@/lib/birth-region";
 import { buildFutureFortune, type FutureFortuneSummary } from "@/lib/future-fortune";
+import { getNameCharRoles, parseNameStrokes } from "@/lib/surname-hanja";
 
 export type Oheng = "목" | "화" | "토" | "금" | "수";
 export type YinYang = "양" | "음";
@@ -210,13 +211,9 @@ export function lookup81(suri: number): { gilHeung: GilHeung; gridName: string; 
   };
 }
 
-/** 이름 구조 → A(성), B(이름1), C(이름2) */
+/** @deprecated use parseNameStrokes from surname-hanja */
 export function parseNameStructure(name: string, strokes: number[]) {
-  const len = name.length;
-  if (len === 2) return { A: strokes[0], B: strokes[1], C: 0 };
-  if (len === 3) return { A: strokes[0], B: strokes[1], C: strokes[2] };
-  if (len === 4) return { A: strokes[0] + strokes[1], B: strokes[2], C: strokes[3] };
-  throw new Error("2~4글자 한글 이름만 분석할 수 있습니다.");
+  return parseNameStrokes(name, strokes);
 }
 
 export function analyzeYinYang(slots: StrokeSlot[]): { gilHeung: GilHeung; pattern: YinYang[]; summary: string } {
@@ -451,12 +448,7 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
 
   const strokes = input.hanjaSlots.map((s) => s.wonStrokes);
 
-  const roles: StrokeSlot["role"][] =
-    chars.length === 2
-      ? ["성", "이름1"]
-      : chars.length === 3
-        ? ["성", "이름1", "이름2"]
-        : ["성", "성", "이름1", "이름2"];
+  const roles = getNameCharRoles(name);
 
   const slots: StrokeSlot[] = chars.map((char, i) => ({
     char,
@@ -471,7 +463,7 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
   const hanjaDisplay = input.hanjaSlots.map((s) => s.hanja).join("");
   const sourceOheng = input.hanjaSlots.map((s) => s.oheng);
 
-  const { A, B, C } = parseNameStructure(name, strokes);
+  const { A, B, C } = parseNameStrokes(name, strokes);
   const yinYang = analyzeYinYang(slots);
   const pronunciation = analyzePronunciation(name);
   const sagyeok = computeSagyeok(A, B, C, slots);

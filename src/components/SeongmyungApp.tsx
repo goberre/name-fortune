@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CoupleMusokDashboard from "@/components/musok/CoupleMusokDashboard";
 import IntroMusok from "@/components/musok/IntroMusok";
 import MusokDashboard from "@/components/musok/MusokDashboard";
@@ -9,8 +9,10 @@ import MusokLoader from "@/components/musok/MusokLoader";
 import HanjaPicker from "@/components/seongmyung/HanjaPicker";
 import Step1Form, { buildBirthProfile } from "@/components/seongmyung/Step1Form";
 import { analyzeCoupleCompatibility, type CoupleCompatibilityResult } from "@/lib/compatibility";
-import { getHanjaCandidates, loadHanjaIndex, type HanjaSelection } from "@/lib/hanja";
+import { validateBirthDateFields } from "@/lib/date-utils";
+import { getDefaultHanjaSelection, loadHanjaIndex, type HanjaSelection } from "@/lib/hanja";
 import { analyzeSeongmyung, isValidKoreanName, type SeongmyungResult } from "@/lib/seongmyung";
+import { getNameCharRoles } from "@/lib/surname-hanja";
 import type { CalendarType, Gender } from "@/types/birth";
 
 function sanitizeName(value: string) {
@@ -34,11 +36,8 @@ function validateBirth(
   birthCity: string,
   birthDistrict: string,
 ): string | null {
-  if (!birthYear || !birthMonth || !birthDay) return "생년월일을 모두 입력해 주세요.";
-  const y = Number(birthYear);
-  const m = Number(birthMonth);
-  const d = Number(birthDay);
-  if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return "올바른 생년월일을 입력해 주세요.";
+  const dateErr = validateBirthDateFields(birthYear, birthMonth, birthDay);
+  if (dateErr) return dateErr;
   if (!birthCity || !birthDistrict) return "태어난 시·도와 구·군·시를 선택해 주세요.";
   return null;
 }
@@ -73,6 +72,7 @@ export default function SeongmyungApp() {
   const [partnerIsComposing, setPartnerIsComposing] = useState(false);
 
   const [hanjaIndexReady, setHanjaIndexReady] = useState(false);
+  const [hanjaAutoFillDone, setHanjaAutoFillDone] = useState(false);
   const [result, setResult] = useState<SeongmyungResult | null>(null);
   const [coupleResult, setCoupleResult] = useState<CoupleCompatibilityResult | null>(null);
   const [error, setError] = useState("");
@@ -80,8 +80,21 @@ export default function SeongmyungApp() {
 
   const chars = useMemo(() => [...name], [name]);
   const partnerChars = useMemo(() => [...partnerName], [partnerName]);
+  const hanjaSelectionsRef = useRef(hanjaSelections);
+  const partnerHanjaSelectionsRef = useRef(partnerHanjaSelections);
+  useEffect(() => {
+    hanjaSelectionsRef.current = hanjaSelections;
+  }, [hanjaSelections]);
+
+  useEffect(() => {
+    partnerHanjaSelectionsRef.current = partnerHanjaSelections;
+  }, [partnerHanjaSelections]);
 
   const goTo = useCallback((next: Step, dir: number) => {
+    if (next === 2) {
+      setHanjaIndexReady(false);
+      setHanjaAutoFillDone(false);
+    }
     setDirection(dir);
     setStep(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -133,33 +146,45 @@ export default function SeongmyungApp() {
   useEffect(() => {
     if (step !== 2 || !hanjaIndexReady) return;
     let cancelled = false;
+
     (async () => {
+      const selfRoles = getNameCharRoles(name);
       const selfNext = await Promise.all(
         chars.map(async (ch, i) => {
-          if (hanjaSelections[i]?.hangul === ch) return hanjaSelections[i];
-          const list = await getHanjaCandidates(ch);
-          return list[0] ? { hangul: ch, ...list[0] } : null;
+          const existing = hanjaSelectionsRef.current[i];
+          if (existing?.hangul === ch && existing.hanja) return existing;
+          const pick = await getDefaultHanjaSelection(ch, selfRoles[i] === "성", {
+            fullName: name,
+            charIndex: i,
+          });
+          return pick ? { hangul: ch, ...pick } : null;
         }),
       );
       if (cancelled) return;
       setHanjaSelections(selfNext);
 
       if (mode === "couple") {
+        const partnerRoles = getNameCharRoles(partnerName);
         const partnerNext = await Promise.all(
           partnerChars.map(async (ch, i) => {
-            if (partnerHanjaSelections[i]?.hangul === ch) return partnerHanjaSelections[i];
-            const list = await getHanjaCandidates(ch);
-            return list[0] ? { hangul: ch, ...list[0] } : null;
+            const existing = partnerHanjaSelectionsRef.current[i];
+            if (existing?.hangul === ch && existing.hanja) return existing;
+            const pick = await getDefaultHanjaSelection(ch, partnerRoles[i] === "성", {
+              fullName: partnerName,
+              charIndex: i,
+            });
+            return pick ? { hangul: ch, ...pick } : null;
           }),
         );
         if (!cancelled) setPartnerHanjaSelections(partnerNext);
       }
+
+      if (!cancelled) setHanjaAutoFillDone(true);
     })();
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, hanjaIndexReady, name, partnerName, mode]);
+  }, [step, hanjaIndexReady, name, partnerName, mode, chars, partnerChars]);
 
   function handleHanjaSelect(index: number, selection: HanjaSelection) {
     setInkPulse(true);
@@ -184,6 +209,16 @@ export default function SeongmyungApp() {
   function enterApp() {
     setMode("solo");
     setError("");
+    goTo(1, 1);
+  }
+
+  function enterCouple() {
+    setMode("couple");
+    setError("");
+    setResult(null);
+    setCoupleResult(null);
+    setPartnerName("");
+    setPartnerHanjaSelections([]);
     goTo(1, 1);
   }
 
@@ -256,19 +291,41 @@ export default function SeongmyungApp() {
     }));
   }
 
+  function validateHanjaSlots(
+    selections: (HanjaSelection | null)[],
+    targetChars: string[],
+    label: string,
+  ): string | null {
+    for (let i = 0; i < targetChars.length; i++) {
+      const sel = selections[i];
+      if (!sel?.hanja || sel.hangul !== targetChars[i]) {
+        return `${label} 「${targetChars[i]}」 글자의 한자를 선택해 주세요.`;
+      }
+    }
+    return null;
+  }
+
   function handleAnalyze() {
     setError("");
-    if (hanjaSelections.some((s) => !s)) {
-      setError("본인 이름의 모든 글자에 한자를 선택해 주세요.");
+    if (!hanjaAutoFillDone) {
+      setError("한자 후보를 불러오는 중입니다. 잠시만 기다려 주세요.");
       return;
     }
-    if (mode === "couple" && partnerHanjaSelections.some((s) => !s)) {
-      setError("상대 이름의 모든 글자에 한자를 선택해 주세요.");
+    const selfErr = validateHanjaSlots(hanjaSelections, chars, "본인");
+    if (selfErr) {
+      setError(selfErr);
       return;
+    }
+    if (mode === "couple") {
+      const partnerErr = validateHanjaSlots(partnerHanjaSelections, partnerChars, "상대");
+      if (partnerErr) {
+        setError(partnerErr);
+        return;
+      }
     }
 
     try {
-      const selfSlots = hanjaSelections as HanjaSelection[];
+      const selfSlots = hanjaSelections.slice(0, chars.length) as HanjaSelection[];
       const selfBirth = buildBirthProfile({
         birthYear,
         birthMonth,
@@ -290,7 +347,7 @@ export default function SeongmyungApp() {
         );
       } else {
         setResult(null);
-        const partnerSlots = partnerHanjaSelections as HanjaSelection[];
+        const partnerSlots = partnerHanjaSelections.slice(0, partnerChars.length) as HanjaSelection[];
         setCoupleResult(
           analyzeCoupleCompatibility({
             personA: { name, hanjaSlots: mapHanjaSlots(selfSlots), birth: selfBirth },
@@ -343,6 +400,7 @@ export default function SeongmyungApp() {
     setPartnerBirthDistrict("");
     setPartnerHanjaSelections([]);
     setHanjaIndexReady(false);
+    setHanjaAutoFillDone(false);
     setError("");
   }
 
@@ -399,7 +457,7 @@ export default function SeongmyungApp() {
       <AnimatePresence mode="wait" custom={direction}>
         {step === "intro" && (
           <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <IntroMusok onEnter={enterApp} />
+            <IntroMusok onEnter={enterApp} onEnterCouple={enterCouple} />
           </motion.div>
         )}
 
@@ -490,31 +548,49 @@ export default function SeongmyungApp() {
               <p className="mt-2 text-xs text-[var(--mk-ivory-muted)]">원획법(原劃法) 획수와 토속 오행 기운을 확인하십시오</p>
             </div>
 
-            <div>
-              {mode === "couple" && <p className="mk-label mb-3 px-1">본인 — {name}</p>}
+            <div className={mode === "couple" ? "space-y-3 rounded border border-[var(--mk-cinnabar)]/20 bg-[var(--mk-cinnabar)]/5 p-4" : "space-y-3"}>
+              {mode === "couple" && (
+                <div className="flex items-center gap-2 px-1">
+                  <span className="rounded border border-[var(--mk-cinnabar)]/40 bg-[var(--mk-cinnabar)]/10 px-2 py-0.5 text-[10px] text-[var(--mk-cinnabar-soft)]">
+                    본인
+                  </span>
+                  <p className="font-musok text-sm text-[var(--mk-ivory)]">{name}</p>
+                </div>
+              )}
               {chars.map((ch, i) => (
                 <HanjaPicker
-                  key={`self-${ch}-${i}`}
+                  key={`self-${name}-${ch}-${i}`}
                   hangul={ch}
                   index={i}
                   selected={hanjaSelections[i] ?? null}
                   onSelect={handleHanjaSelect}
                   variant="musok"
+                  role={getNameCharRoles(name)[i]}
+                  person={mode === "couple" ? "self" : undefined}
+                  fullName={name}
                 />
               ))}
             </div>
 
             {mode === "couple" && (
-              <div className="pt-2">
-                <p className="mk-label mb-3 px-1">상대 — {partnerName}</p>
+              <div className="space-y-3 rounded border border-emerald-600/25 bg-emerald-950/20 p-4 pt-2">
+                <div className="flex items-center gap-2 px-1">
+                  <span className="rounded border border-emerald-600/40 bg-emerald-950/40 px-2 py-0.5 text-[10px] text-emerald-400/90">
+                    상대
+                  </span>
+                  <p className="font-musok text-sm text-[var(--mk-ivory)]">{partnerName}</p>
+                </div>
                 {partnerChars.map((ch, i) => (
                   <HanjaPicker
-                    key={`partner-${ch}-${i}`}
+                    key={`partner-${partnerName}-${ch}-${i}`}
                     hangul={ch}
-                    index={i + chars.length}
+                    index={i}
                     selected={partnerHanjaSelections[i] ?? null}
                     onSelect={handlePartnerHanjaSelect}
                     variant="musok"
+                    role={getNameCharRoles(partnerName)[i]}
+                    person="partner"
+                    fullName={partnerName}
                   />
                 ))}
               </div>
@@ -526,16 +602,30 @@ export default function SeongmyungApp() {
               <button type="button" onClick={() => goTo(mode === "couple" ? "1b" : 1, -1)} className="mk-btn mk-btn-ghost flex-1">
                 이전
               </button>
-              <button type="button" onClick={handleAnalyze} className="mk-btn mk-btn-primary flex-[2]">
+              <button
+                type="button"
+                onClick={handleAnalyze}
+                disabled={!hanjaAutoFillDone}
+                className="mk-btn mk-btn-primary flex-[2] disabled:cursor-not-allowed disabled:opacity-50"
+              >
                 {mode === "couple" ? "쌍통(雙通) 열기" : "신수 명통 열기"}
               </button>
             </div>
           </motion.div>
         )}
 
-        {step === "loading" && (result || coupleResult) && (
+        {step === "loading" && (
           <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <MusokLoader onComplete={() => goTo("result", 1)} />
+            {result || coupleResult ? (
+              <MusokLoader onComplete={() => goTo("result", 1)} />
+            ) : (
+              <div className="mk-card p-8 text-center">
+                <p className="text-sm text-[var(--mk-cinnabar-soft)]">분석 결과를 불러오지 못했습니다.</p>
+                <button type="button" onClick={() => goTo(2, -1)} className="mk-btn mk-btn-ghost mt-6 w-full">
+                  한자 선택으로 돌아가기
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
 

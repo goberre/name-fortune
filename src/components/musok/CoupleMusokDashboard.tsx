@@ -1,9 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
+import AdSlot from "@/components/monetization/AdSlot";
+import CoupangSlot from "@/components/monetization/CoupangSlot";
 import BrushText from "@/components/musok/BrushText";
 import CoupleHarmonyGauge from "@/components/musok/CoupleHarmonyGauge";
 import PremiumPaywall from "@/components/musok/PremiumPaywall";
+import SurnameHanjaPanel from "@/components/musok/SurnameHanjaPanel";
+import { adsConfig } from "@/config/ads";
 import { gilBadgeClass } from "@/lib/compatibility-copy";
 import type { CoupleCompatibilityResult } from "@/lib/compatibility";
 import { MUSOK_MOTTO } from "@/lib/musok-copy";
@@ -40,8 +44,25 @@ export default function CoupleMusokDashboard({
         <p className="mt-2 text-center text-[11px] text-[var(--mk-ivory-muted)]">{result.teaser}</p>
       </motion.div>
 
+      {adsConfig.adsenseSlotTop && (
+        <motion.div variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}>
+          <AdSlot slotId={adsConfig.adsenseSlotTop} className="mx-auto max-w-md" />
+        </motion.div>
+      )}
+
       <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="mk-card p-5">
         <BrushText text={MUSOK_MOTTO} className="text-center text-sm italic text-[var(--mk-ivory-dim)]" />
+      </motion.div>
+
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <p className="px-1 text-[10px] text-[var(--mk-cinnabar-soft)]">본인 · {personA.name}</p>
+          <SurnameHanjaPanel slots={personA.slots} name={personA.name} />
+        </div>
+        <div className="space-y-2">
+          <p className="px-1 text-[10px] text-emerald-400/90">상대 · {personB.name}</p>
+          <SurnameHanjaPanel slots={personB.slots} name={personB.name} />
+        </div>
       </motion.div>
 
       {/* 무료 요약 */}
@@ -164,6 +185,13 @@ export default function CoupleMusokDashboard({
           </div>
         </PremiumPaywall>
       </motion.div>
+
+      {(adsConfig.adsenseSlotMid || adsConfig.coupangWidgetId) && (
+        <motion.div variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }} className="space-y-4">
+          {adsConfig.adsenseSlotMid && <AdSlot slotId={adsConfig.adsenseSlotMid} />}
+          <CoupangSlot />
+        </motion.div>
+      )}
 
       <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
         <button type="button" onClick={onReset} className="mk-btn mk-btn-ghost w-full">

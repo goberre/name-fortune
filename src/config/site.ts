@@ -3,7 +3,7 @@ export const siteConfig = {
   name: "이름으로 풀어보자",
   tagline: "한글 이름과 획수로 성명학 기반 역학을 확인하세요",
   description:
-    "음양 조화, 발음오행, 81수리 원격·형격·이격·정격 분석. 한글 이름·한자 획수·생년 자원오행. 무료, ehfrhfo.com 돌고래.",
+    "음양 조화, 발음오행, 81수리 원·형·이·정격 분석. 한글 이름·한자 획수·생년 자원오행을 무료로 확인하세요.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://name.ehfrhfo.com",
   locale: "ko_KR",
   ogImage: "/og-image.svg",

@@ -5,7 +5,10 @@ const STORAGE_KEY = "name-fortune-couple-premium";
 export function isCouplePremiumUnlocked(): boolean {
   if (typeof window === "undefined") return false;
   if (sessionStorage.getItem(STORAGE_KEY) === "1") return true;
-  return new URLSearchParams(window.location.search).get("premium") === "1";
+  if (process.env.NODE_ENV === "development") {
+    return new URLSearchParams(window.location.search).get("premium") === "1";
+  }
+  return false;
 }
 
 export function unlockCouplePremium(): void {

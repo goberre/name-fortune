@@ -1,5 +1,6 @@
 import type { Oheng } from "@/lib/seongmyung";
 import { sortCandidates, isPopularHanja } from "@/lib/popular-hanja";
+import { getSurnameEntry, getSurnameHanjaOptions, getSurnameCharDefaultHanja } from "@/lib/surname-hanja";
 import { getWonhyeokStrokes } from "@/lib/wonhyeok";
 
 export type HanjaCandidate = {
@@ -87,15 +88,80 @@ export async function loadHanjaIndex(): Promise<HanjaIndexMeta> {
   return loadPromise;
 }
 
-export async function getHanjaCandidates(hangul: string): Promise<HanjaCandidate[]> {
-  const cached = candidateCache.get(hangul);
+function mergeSurnameCandidates(hangul: string, base: HanjaCandidate[]): HanjaCandidate[] {
+  const surnameOpts = getSurnameHanjaOptions(hangul);
+  if (surnameOpts.length === 0) return base;
+
+  const byHanja = new Map<string, HanjaCandidate>();
+  for (const opt of surnameOpts) {
+    if (opt.hanja.length !== 1) continue;
+    byHanja.set(opt.hanja, {
+      hanja: opt.hanja,
+      meaning: opt.meaning,
+      oheng: inferOheng(opt.hanja, opt.meaning),
+      wonStrokes: getWonhyeokStrokes(opt.hanja),
+    });
+  }
+  for (const c of base) {
+    if (!byHanja.has(c.hanja)) byHanja.set(c.hanja, c);
+  }
+  return sortCandidates(hangul, [...byHanja.values()]);
+}
+
+function surnameCacheKey(hangul: string, asSurname: boolean) {
+  return `${hangul}:${asSurname ? "s" : "g"}`;
+}
+
+export async function getHanjaCandidates(
+  hangul: string,
+  options?: { asSurname?: boolean },
+): Promise<HanjaCandidate[]> {
+  const asSurname = options?.asSurname ?? false;
+  const cacheKey = surnameCacheKey(hangul, asSurname);
+  const cached = candidateCache.get(cacheKey);
   if (cached) return cached;
 
   const data = await loadHanjaIndex();
   const raw = data.index[hangul] ?? [];
-  const result = sortCandidates(hangul, raw.map(enrich));
-  candidateCache.set(hangul, result);
+  let result = sortCandidates(hangul, raw.map(enrich));
+  if (asSurname) {
+    result = mergeSurnameCandidates(hangul, result);
+    const entry = getSurnameEntry(hangul);
+    if (entry?.primary.length === 1) {
+      const primaryIdx = result.findIndex((c) => c.hanja === entry.primary);
+      if (primaryIdx > 0) {
+        const [primary] = result.splice(primaryIdx, 1);
+        result.unshift(primary);
+      }
+    }
+  }
+  candidateCache.set(cacheKey, result);
   return result;
+}
+
+export async function getDefaultHanjaSelection(
+  hangul: string,
+  asSurname: boolean,
+  context?: { fullName?: string; charIndex?: number },
+): Promise<HanjaCandidate | null> {
+  const list = await getHanjaCandidates(hangul, { asSurname });
+  if (list.length === 0) return null;
+
+  if (asSurname && context?.fullName !== undefined && context.charIndex !== undefined) {
+    const preferred = getSurnameCharDefaultHanja(context.fullName, context.charIndex);
+    if (preferred) {
+      return list.find((c) => c.hanja === preferred) ?? list[0] ?? null;
+    }
+  }
+
+  if (asSurname) {
+    const entry = getSurnameEntry(hangul);
+    if (entry?.primary.length === 1) {
+      return list.find((c) => c.hanja === entry.primary) ?? list[0] ?? null;
+    }
+  }
+
+  return list[0] ?? null;
 }
 
 export { isPopularHanja };

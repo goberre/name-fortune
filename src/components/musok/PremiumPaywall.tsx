@@ -55,8 +55,11 @@ export default function PremiumPaywall({ pairScore, nameA, nameB, children, teas
             상세 궁합 명통 열기
           </button>
           <button type="button" onClick={handleConfirmPaid} className="mk-btn mk-btn-ghost mt-3 w-full max-w-xs text-xs">
-            결제 완료 — 잠금 해제
+            결제 완료 확인 (결제 페이지에서 돌아온 경우)
           </button>
+          <p className="mt-3 max-w-xs text-[10px] leading-relaxed text-[var(--mk-ivory-muted)]">
+            결제 연동 전까지는 결제 후 위 버튼으로 잠금을 해제합니다. 추후 자동 확인으로 전환됩니다.
+          </p>
           <button
             type="button"
             onClick={() => setUnlocked(isCouplePremiumUnlocked())}

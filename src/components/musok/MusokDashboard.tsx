@@ -9,8 +9,9 @@ import HanjiTimeline from "@/components/musok/HanjiTimeline";
 import MusokBirthPlacePanel from "@/components/musok/MusokBirthPlacePanel";
 import OhengSalpuriGuide from "@/components/musok/OhengSalpuriGuide";
 import SinsuMyeongtongGauge from "@/components/musok/SinsuMyeongtongGauge";
+import SurnameHanjaPanel from "@/components/musok/SurnameHanjaPanel";
 import { adsConfig } from "@/config/ads";
-import { getFullDistrictLabel } from "@/lib/birth-districts";
+import { getFullDistrictLabel, formatCoordinates } from "@/lib/birth-districts";
 import { MUSOK_MOTTO } from "@/lib/musok-copy";
 import type { SeongmyungResult } from "@/lib/seongmyung";
 import { CALENDAR_LABEL, GENDER_LABEL } from "@/types/birth";
@@ -50,8 +51,11 @@ export default function MusokDashboard({
         )}
         {result.sajuProfile?.regionLat !== undefined && result.sajuProfile.regionLng !== undefined && (
           <p className="mt-1 text-center font-mono text-[10px] text-[var(--mk-cinnabar-soft)]">
-            {result.sajuProfile.regionLat.toFixed(4)}°N, {result.sajuProfile.regionLng.toFixed(4)}°E
+            {formatCoordinates(result.sajuProfile.regionLat, result.sajuProfile.regionLng)}
           </p>
+        )}
+        {result.sajuProfile?.calendarNote && (
+          <p className="mt-2 text-center text-[10px] leading-relaxed text-amber-200/70">{result.sajuProfile.calendarNote}</p>
         )}
       </motion.div>
 
@@ -63,6 +67,10 @@ export default function MusokDashboard({
 
       <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="mk-card p-5">
         <BrushText text={MUSOK_MOTTO} className="text-center text-sm italic text-[var(--mk-ivory-dim)]" />
+      </motion.div>
+
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+        <SurnameHanjaPanel slots={result.slots} name={result.name} />
       </motion.div>
 
       {result.birthRegionAnalysis && (

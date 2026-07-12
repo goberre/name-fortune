@@ -114,15 +114,21 @@ export default function Step1Form(props: Props) {
           onChange={props.setCalendarType}
         />
         {props.calendarType === "lunar" && (
-          <label className="mt-3 flex items-center gap-2 text-sm text-[var(--mk-ivory-dim)]">
-            <input
-              type="checkbox"
-              checked={props.isLeapMonth}
-              onChange={(e) => props.setIsLeapMonth(e.target.checked)}
-              className="h-4 w-4"
-            />
-            윤달 (閏月)
-          </label>
+          <>
+            <label className="mt-3 flex items-center gap-2 text-sm text-[var(--mk-ivory-dim)]">
+              <input
+                type="checkbox"
+                checked={props.isLeapMonth}
+                onChange={(e) => props.setIsLeapMonth(e.target.checked)}
+                className="h-4 w-4"
+              />
+              윤달 (閏月)
+            </label>
+            <p className="mt-2 rounded border border-amber-600/30 bg-amber-950/20 px-3 py-2 text-xs leading-relaxed text-amber-200/80">
+              음력·윤달은 양력으로 자동 변환되지 않습니다. 사주·궁합은 입력한 날짜 기준 참고 풀이이며, 정확한
+              사주는 양력 생일을 권장합니다.
+            </p>
+          </>
         )}
         <div className="mt-3 grid grid-cols-3 gap-3">
           <input

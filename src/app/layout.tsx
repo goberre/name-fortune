@@ -1,9 +1,16 @@
 import type { Metadata, Viewport } from "next";
+import { Noto_Serif_KR } from "next/font/google";
 import JsonLd from "@/components/JsonLd";
 import { brandUrls } from "@/config/brand";
 import { seoConfig } from "@/config/seo";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
+
+const notoSerifKr = Noto_Serif_KR({
+  weight: ["400", "600"],
+  display: "swap",
+  variable: "--font-noto-serif-kr",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -26,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: seoConfig.locale,
     url: siteConfig.url,
-    siteName: siteConfig.brand,
+    siteName: siteConfig.name,
     title: seoConfig.title,
     description: seoConfig.description,
     images: [{ url: seoConfig.ogImage, width: 1200, height: 630, alt: seoConfig.title }],
@@ -41,17 +48,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={notoSerifKr.variable}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="home" href={brandUrls.hub} />
         <link rel="preload" href="/data/hanja-index.json" as="fetch" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body className="mk-body min-h-screen antialiased">
         <JsonLd />

@@ -2,8 +2,14 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
-import { getHanjaCandidates, isPopularHanja, type HanjaCandidate, type HanjaSelection } from "@/lib/hanja";
+import {
+  getHanjaCandidates,
+  isPopularHanja,
+  type HanjaCandidate,
+  type HanjaSelection,
+} from "@/lib/hanja";
 import { OHENG_OBANG } from "@/lib/musok-copy";
+import { getCompoundSurname, getSurnameGloss, getSurnameSummary } from "@/lib/surname-hanja";
 import { type Oheng } from "@/lib/seongmyung";
 
 const OHENG_STYLE: Record<Oheng, string> = {
@@ -27,15 +33,29 @@ function OhengMusokBadge({ oheng }: { oheng: Oheng }) {
   );
 }
 
+export type HanjaPickerPerson = "self" | "partner";
+
 type Props = {
   hangul: string;
   index: number;
   selected: HanjaSelection | null;
   onSelect: (index: number, selection: HanjaSelection) => void;
   variant?: "light" | "musok";
+  role?: "성" | "이름1" | "이름2";
+  person?: HanjaPickerPerson;
+  fullName?: string;
 };
 
-export default function HanjaPicker({ hangul, index, selected, onSelect, variant = "musok" }: Props) {
+export default function HanjaPicker({
+  hangul,
+  index,
+  selected,
+  onSelect,
+  variant = "musok",
+  role,
+  person,
+  fullName,
+}: Props) {
   const [candidates, setCandidates] = useState<HanjaCandidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -43,26 +63,35 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
   const [expanded, setExpanded] = useState(false);
   const [pulseKey, setPulseKey] = useState<string | null>(null);
   const musok = variant === "musok";
+  const isSurname = role === "성";
+
+  const compoundSurname = fullName ? getCompoundSurname(fullName) : undefined;
+  const surnameSummary = isSurname
+    ? (index === 0 && compoundSurname
+        ? getSurnameSummary(compoundSurname)
+        : getSurnameSummary(hangul))
+    : undefined;
 
   useEffect(() => {
     let cancelled = false;
-    getHanjaCandidates(hangul)
+    getHanjaCandidates(hangul, { asSurname: isSurname })
       .then((list) => {
         if (!cancelled) {
           setCandidates(list);
           setError(list.length === 0 ? `「${hangul}」에 해당하는 인명용 한자가 없습니다.` : "");
+          setLoading(false);
         }
       })
       .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "한자 데이터 로드 실패");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "한자 데이터 로드 실패");
+          setLoading(false);
+        }
       });
     return () => {
       cancelled = true;
     };
-  }, [hangul]);
+  }, [hangul, isSurname]);
 
   const filtered = useMemo(() => {
     const q = query.trim();
@@ -73,13 +102,25 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
   const visible = expanded ? filtered : filtered.slice(0, 8);
   const hasMore = filtered.length > 8;
 
+  const selectedGloss =
+    isSurname && selected ? getSurnameGloss(hangul, selected.hanja) : undefined;
+
   function pick(c: HanjaCandidate) {
     setPulseKey(c.hanja);
     onSelect(index, { hangul, ...c });
     setTimeout(() => setPulseKey(null), 500);
   }
 
-  const cardCls = musok ? "mk-card p-5" : "ap-card p-5";
+  const cardCls = musok
+    ? person === "partner"
+      ? "mk-card border border-[var(--mk-border)] border-l-4 border-l-emerald-600/70 bg-[var(--mk-charcoal)]/80 p-5"
+      : person === "self"
+        ? "mk-card border border-[var(--mk-border)] border-l-4 border-l-[var(--mk-cinnabar)] bg-[var(--mk-charcoal)]/80 p-5"
+        : "mk-card p-5"
+    : "ap-card p-5";
+
+  const roleLabel =
+    role === "성" ? "성씨 (姓)" : role === "이름1" ? "이름 (名)" : role === "이름2" ? "이름 (名)" : null;
 
   return (
     <motion.div
@@ -88,25 +129,55 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
       transition={{ delay: index * 0.05 }}
       className={cardCls}
     >
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex items-start gap-3">
         <span
-          className={`flex h-12 w-12 items-center justify-center text-xl font-semibold ${
+          className={`flex h-12 w-12 shrink-0 items-center justify-center text-xl font-semibold ${
             musok
-              ? "border border-[var(--mk-border)] bg-[var(--mk-charcoal-light)] font-musok text-[var(--mk-ivory)]"
+              ? isSurname
+                ? "border border-[var(--mk-cinnabar)]/50 bg-[var(--mk-cinnabar)]/10 font-musok text-[var(--mk-cinnabar-soft)]"
+                : "border border-[var(--mk-border)] bg-[var(--mk-charcoal-light)] font-musok text-[var(--mk-ivory)]"
               : "rounded-2xl bg-neutral-100 text-neutral-900"
           }`}
         >
           {hangul}
         </span>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            {roleLabel && (
+              <span
+                className={`text-[10px] tracking-wider ${
+                  isSurname ? "text-[var(--mk-cinnabar-soft)]" : "text-[var(--mk-ivory-muted)]"
+                }`}
+              >
+                {roleLabel}
+              </span>
+            )}
+            {person === "self" && (
+              <span className="rounded border border-[var(--mk-cinnabar)]/30 px-1.5 py-0.5 text-[10px] text-[var(--mk-cinnabar-soft)]">
+                본인
+              </span>
+            )}
+            {person === "partner" && (
+              <span className="rounded border border-emerald-600/40 px-1.5 py-0.5 text-[10px] text-emerald-400/90">
+                상대
+              </span>
+            )}
+          </div>
           <p className={`text-sm font-medium ${musok ? "text-[var(--mk-ivory)]" : "text-neutral-900"}`}>
-            {musok ? "한자 · 원획 · 오행" : "한자 선택"}
+            {isSurname ? "성씨 한자 · 원획 · 오행" : "한자 · 원획 · 오행"}
           </p>
           <p className={`text-xs ${musok ? "text-[var(--mk-ivory-muted)]" : "text-neutral-500"}`}>
-            {loading ? "불러오는 중…" : `${candidates.length}개 · 인기 한자 우선 · 원획법`}
+            {loading ? "불러오는 중…" : `${candidates.length}개 · ${isSurname ? "성씨 한자 우선" : "인기 한자 우선"} · 원획법`}
           </p>
         </div>
       </div>
+
+      {isSurname && surnameSummary && !loading && (
+        <div className="mb-3 border border-[var(--mk-cinnabar)]/25 bg-[var(--mk-cinnabar)]/5 px-3 py-2.5">
+          <p className="text-[10px] tracking-wider text-[var(--mk-cinnabar-soft)]">성씨 풀이</p>
+          <p className="mt-1 text-xs leading-relaxed text-[var(--mk-ivory-dim)]">{surnameSummary}</p>
+        </div>
+      )}
 
       {!loading && candidates.length > 6 && (
         <input
@@ -134,6 +205,7 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
             {visible.map((c, vi) => {
               const active = selected?.hanja === c.hanja;
               const popular = vi < 6 && isPopularHanja(hangul, c.hanja);
+              const gloss = isSurname ? getSurnameGloss(hangul, c.hanja) : undefined;
               const pulsing = pulseKey === c.hanja;
               return (
                 <motion.button
@@ -156,30 +228,35 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
                         }`
                   }
                 >
-                  <div className="flex items-center gap-3">
-                    <span className={`text-2xl font-serif ${musok ? "text-[var(--mk-ivory)]" : active ? "text-white" : "text-neutral-900"}`}>
-                      {c.hanja}
-                    </span>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className={`text-sm font-medium ${musok ? "text-[var(--mk-ivory-dim)]" : active ? "text-white" : "text-neutral-900"}`}>
-                          {c.meaning}
+                  <div className="min-w-0 flex-1 pr-2">
+                    <div className="flex items-center gap-3">
+                      <span className={`shrink-0 text-2xl font-serif ${musok ? "text-[var(--mk-ivory)]" : active ? "text-white" : "text-neutral-900"}`}>
+                        {c.hanja}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className={`text-sm font-medium ${musok ? "text-[var(--mk-ivory-dim)]" : active ? "text-white" : "text-neutral-900"}`}>
+                            {c.meaning}
+                          </p>
+                          {popular && (
+                            <span className={`text-[10px] ${musok ? "text-[var(--mk-obang)]" : "rounded-full bg-neutral-900 px-1.5 text-white"}`}>
+                              {isSurname ? "성씨" : "인기"}
+                            </span>
+                          )}
+                        </div>
+                        <p className={`text-xs ${musok ? "text-[var(--mk-ivory-muted)]" : "text-neutral-500"}`}>
+                          원획 {c.wonStrokes}획
                         </p>
-                        {popular && (
-                          <span className={`text-[10px] ${musok ? "text-[var(--mk-obang)]" : "text-white bg-neutral-900 px-1.5 rounded-full"}`}>
-                            인기
-                          </span>
+                        {gloss && (
+                          <p className="mt-1 text-[11px] leading-snug text-[var(--mk-cinnabar-soft)]/90">{gloss}</p>
                         )}
                       </div>
-                      <p className={`text-xs ${musok ? "text-[var(--mk-ivory-muted)]" : "text-neutral-500"}`}>
-                        원획 {c.wonStrokes}획
-                      </p>
                     </div>
                   </div>
                   {musok ? (
                     <OhengMusokBadge oheng={c.oheng} />
                   ) : (
-                    <span className={`rounded-full px-2.5 py-1 text-xs ring-1 ${active ? "bg-white/15 text-white" : OHENG_STYLE[c.oheng]}`}>
+                    <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs ring-1 ${active ? "bg-white/15 text-white" : OHENG_STYLE[c.oheng]}`}>
                       {c.oheng}행
                     </span>
                   )}
@@ -197,6 +274,12 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
             <button type="button" onClick={() => setExpanded(false)} className={`mt-3 w-full py-2 text-sm ${musok ? "mk-btn mk-btn-ghost" : "text-neutral-500"}`}>
               접기
             </button>
+          )}
+
+          {selected && selectedGloss && (
+            <p className="mt-3 border-t border-[var(--mk-border)] pt-3 text-xs leading-relaxed text-[var(--mk-ivory-dim)]">
+              선택: {selectedGloss}
+            </p>
           )}
         </>
       )}
