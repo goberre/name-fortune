@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
-import { getHanjaCandidates, type HanjaCandidate, type HanjaSelection } from "@/lib/hanja";
+import { getHanjaCandidates, isPopularHanja, type HanjaCandidate, type HanjaSelection } from "@/lib/hanja";
 import { type Oheng } from "@/lib/seongmyung";
 
 const OHENG_STYLE: Record<Oheng, string> = {
@@ -74,7 +74,7 @@ export default function HanjaPicker({ hangul, index, selected, onSelect }: Props
         <div className="flex-1">
           <p className="text-sm font-medium text-neutral-900">한자 선택</p>
           <p className="text-xs text-neutral-500">
-            {loading ? "인명용 한자 불러오는 중…" : `${candidates.length}개 후보 · 원획법 · 자원오행`}
+            {loading ? "인명용 한자 불러오는 중…" : `${candidates.length}개 후보 · 인기 한자 우선 · 원획법 · 자원오행`}
           </p>
         </div>
       </div>
@@ -104,8 +104,9 @@ export default function HanjaPicker({ hangul, index, selected, onSelect }: Props
       {!loading && !error && (
         <>
           <div className="space-y-2">
-            {visible.map((c) => {
+            {visible.map((c, vi) => {
               const active = selected?.hanja === c.hanja;
+              const popular = vi < 6 && isPopularHanja(hangul, c.hanja);
               return (
                 <button
                   key={c.hanja}
@@ -122,9 +123,21 @@ export default function HanjaPicker({ hangul, index, selected, onSelect }: Props
                       {c.hanja}
                     </span>
                     <div>
-                      <p className={`text-sm font-medium ${active ? "text-white" : "text-neutral-900"}`}>
-                        {c.meaning}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className={`text-sm font-medium ${active ? "text-white" : "text-neutral-900"}`}>
+                          {c.meaning}
+                        </p>
+                        {popular && !active && (
+                          <span className="rounded-full bg-neutral-900 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                            인기
+                          </span>
+                        )}
+                        {popular && active && (
+                          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                            인기
+                          </span>
+                        )}
+                      </div>
                       <p className={`text-xs ${active ? "text-neutral-300" : "text-neutral-500"}`}>
                         원획 {c.wonStrokes}획
                       </p>

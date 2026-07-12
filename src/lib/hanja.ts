@@ -1,4 +1,5 @@
 import type { Oheng } from "@/lib/seongmyung";
+import { sortCandidates, isPopularHanja } from "@/lib/popular-hanja";
 import { getWonhyeokStrokes } from "@/lib/wonhyeok";
 
 export type HanjaCandidate = {
@@ -88,8 +89,10 @@ export async function loadHanjaIndex(): Promise<HanjaIndexMeta> {
 export async function getHanjaCandidates(hangul: string): Promise<HanjaCandidate[]> {
   const data = await loadHanjaIndex();
   const raw = data.index[hangul] ?? [];
-  return raw.map(enrich);
+  return sortCandidates(hangul, raw.map(enrich));
 }
+
+export { isPopularHanja };
 
 export async function hasHanjaData(hangul: string): Promise<boolean> {
   const data = await loadHanjaIndex();

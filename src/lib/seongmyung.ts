@@ -26,6 +26,12 @@ export type SagyeokGrid = {
   gilHeung: GilHeung;
   gridName: string;
   description: string;
+  /** 획수 계산식 (한글) */
+  formula: string;
+  /** 이 운세가 의미하는 것 */
+  plainGuide: string;
+  /** 실생활 해석 */
+  lifeGuide: string;
 };
 
 export type PronunciationOheng = {
@@ -275,17 +281,73 @@ export function analyzePronunciation(name: string): {
   return { items, flow, gilHeung, summary };
 }
 
-export function computeSagyeok(A: number, B: number, C: number): SagyeokGrid[] {
+const SAGYEOK_GUIDE = {
+  won: {
+    plainGuide: "이름(名) 부분의 획수로, 어릴 때부터 청소년기까지의 기초 운세입니다.",
+    lifeGuide: "학업, 가족 관계, 성격 형성, 첫사회 진입 전까지의 흐름을 봅니다. '태어나서 자라는 과정'의 운이라고 생각하시면 됩니다.",
+  },
+  hyung: {
+    plainGuide: "성(姓)과 이름 첫 글자 획수를 더한 값으로, 인생에서 가장 중요한 '주운(主運)'입니다.",
+    lifeGuide: "20~40대 사회생활, 직업, 배우자, 자립의 핵심 시기입니다. 성명학에서 가장 비중을 두는 운세입니다.",
+  },
+  i: {
+    plainGuide: "성(姓)과 이름 둘째 글자 획수를 더한 값으로, 중년기 가정·사회적 역할의 운세입니다.",
+    lifeGuide: "40~60대 가정 화목, 자녀, 사회적 지위, 리더십 발휘 시기입니다. '사회의 중심에 서는 시기' 운입니다.",
+  },
+  jeong: {
+    plainGuide: "성+이름 전체 획수를 합한 값으로, 말년과 인생 전체를 아우르는 총운입니다.",
+    lifeGuide: "60대 이후 노후, 건강, 명예, 인생을 돌아보는 시기입니다. 이름이 이끄는 최종 결실을 의미합니다.",
+  },
+} as const;
+
+function buildFormula(
+  key: "won" | "hyung" | "i" | "jeong",
+  slots: StrokeSlot[],
+  A: number,
+  B: number,
+  C: number,
+): string {
+  const len = slots.length;
+  if (len === 2) {
+    const seong = slots[0];
+    const irum = slots[1];
+    if (key === "won") return `${irum.char}(${B}획) — 이름 획수`;
+    if (key === "hyung") return `${seong.char}(${A}획) + ${irum.char}(${B}획) = ${A + B}획`;
+    if (key === "i") return `${seong.char}(${A}획) — 성 획수`;
+    return `${seong.char}(${A}획) + ${irum.char}(${B}획) = ${A + B}획`;
+  }
+  if (len === 3) {
+    const seong = slots[0];
+    const irum1 = slots[1];
+    const irum2 = slots[2];
+    if (key === "won") return `${irum1.char}(${B}획) + ${irum2.char}(${C}획) = ${B + C}획`;
+    if (key === "hyung") return `${seong.char}(${A}획) + ${irum1.char}(${B}획) = ${A + B}획`;
+    if (key === "i") return `${seong.char}(${A}획) + ${irum2.char}(${C}획) = ${A + C}획`;
+    return `${seong.char}(${A}획) + ${irum1.char}(${B}획) + ${irum2.char}(${C}획) = ${A + B + C}획`;
+  }
+  // 4글자: 성2 + 이름2
+  const seong1 = slots[0];
+  const seong2 = slots[1];
+  const irum1 = slots[2];
+  const irum2 = slots[3];
+  if (key === "won") return `${irum1.char}(${B}획) + ${irum2.char}(${C}획) = ${B + C}획`;
+  if (key === "hyung") return `성 ${seong1.char}+${seong2.char}(${A}획) + ${irum1.char}(${B}획) = ${A + B}획`;
+  if (key === "i") return `성 ${seong1.char}+${seong2.char}(${A}획) + ${irum2.char}(${C}획) = ${A + C}획`;
+  return `전체 ${A + B + C}획 (성 ${A} + 이름 ${B + C})`;
+}
+
+export function computeSagyeok(A: number, B: number, C: number, slots: StrokeSlot[]): SagyeokGrid[] {
   const grids = [
-    { key: "won" as const, label: "원격", period: "초년운 (1~20세)", sum: B + C },
-    { key: "hyung" as const, label: "형격", period: "청년운 (21~40세)", sum: A + B },
-    { key: "i" as const, label: "이격", period: "장년운 (41~60세)", sum: A + C },
-    { key: "jeong" as const, label: "정격", period: "말년운 (61세~)", sum: A + B + C },
+    { key: "won" as const, label: "원격", period: "초년운 · 1~20세", sum: B + C },
+    { key: "hyung" as const, label: "형격", period: "청년운 · 21~40세", sum: A + B },
+    { key: "i" as const, label: "이격", period: "장년운 · 41~60세", sum: A + C },
+    { key: "jeong" as const, label: "정격", period: "말년운 · 61세 이후", sum: A + B + C },
   ];
 
   return grids.map((g) => {
     const suri = normalize81(g.sum);
     const { gilHeung, gridName, description } = lookup81(suri);
+    const guide = SAGYEOK_GUIDE[g.key];
     return {
       key: g.key,
       label: g.label,
@@ -295,6 +357,9 @@ export function computeSagyeok(A: number, B: number, C: number): SagyeokGrid[] {
       gilHeung,
       gridName,
       description,
+      formula: buildFormula(g.key, slots, A, B, C),
+      plainGuide: guide.plainGuide,
+      lifeGuide: guide.lifeGuide,
     };
   });
 }
@@ -397,7 +462,7 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
   const { A, B, C } = parseNameStructure(name, strokes);
   const yinYang = analyzeYinYang(slots);
   const pronunciation = analyzePronunciation(name);
-  const sagyeok = computeSagyeok(A, B, C);
+  const sagyeok = computeSagyeok(A, B, C, slots);
 
   let sajuProfile: SajuOhengProfile | undefined;
   let sourceOhengHarmony: SourceOhengHarmony | undefined;
