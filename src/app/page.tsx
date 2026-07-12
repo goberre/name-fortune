@@ -1,4 +1,3 @@
-import MysticAmbience from "@/components/MysticAmbience";
 import SeongmyungApp from "@/components/SeongmyungApp";
 import { brandUrls } from "@/config/brand";
 import { siteConfig } from "@/config/site";
@@ -7,8 +6,6 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div className="nf-bg relative min-h-screen">
-      <MysticAmbience />
-
       <div className="relative z-10">
         <header className="mx-auto flex max-w-2xl items-center justify-between px-5 py-5">
           <a href={brandUrls.hub} className="text-sm text-violet-300/50 transition hover:text-violet-200">
