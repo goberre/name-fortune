@@ -15,6 +15,8 @@ const notoSerifKr = Noto_Serif_KR({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
   themeColor: "#0B0B0C",
 };
 

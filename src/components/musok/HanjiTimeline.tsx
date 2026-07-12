@@ -30,7 +30,7 @@ function HanjiCard({
       initial={{ opacity: 0, y: 32 }}
       animate={inView ? { opacity: isPast ? 0.55 : 1, y: 0 } : {}}
       transition={{ delay: index * 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className={`mk-card mk-hanji p-5 sm:p-6 ${isHyung ? "mk-card-hyung" : ""} ${isCurrent ? "mk-card-current" : ""}`}
+      className={`mk-card mk-hanji p-4 sm:p-5 md:p-6 ${isHyung ? "mk-card-hyung" : ""} ${isCurrent ? "mk-card-current" : ""}`}
     >
       <div className="flex flex-wrap items-center gap-2">
         {isCurrent && <span className="mk-tag">현재</span>}
@@ -40,8 +40,8 @@ function HanjiCard({
       </div>
       <p className="mt-1 text-xs text-[var(--mk-ivory-muted)]">{meta.epoch}</p>
 
-      <div className="mt-4 flex items-baseline gap-2">
-        <span className="font-musok text-3xl text-[var(--mk-ivory)]">{grid.suri}</span>
+      <div className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 sm:gap-x-3">
+        <span className="font-musok text-2xl text-[var(--mk-ivory)] sm:text-3xl">{grid.suri}</span>
         <span className="text-sm text-[var(--mk-ivory-dim)]">수 · {grid.gridName}</span>
         <span className="mk-tag text-[10px]">{GIL_MUSOK[grid.gilHeung]}</span>
       </div>

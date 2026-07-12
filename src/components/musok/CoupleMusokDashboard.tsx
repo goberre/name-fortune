@@ -89,12 +89,12 @@ export default function CoupleMusokDashboard({
         <p className="mk-kicker px-1">항목별 궁합 (미리보기)</p>
         {result.dimensions.map((d) => (
           <div key={d.key} className="mk-card p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <span className="font-musok text-[var(--mk-cinnabar-soft)]">{d.hanja}</span>
                 <span className="ml-2 text-sm text-[var(--mk-ivory)]">{d.label}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 <span className={`border px-2 py-0.5 text-[10px] ${gilBadgeClass(d.gilHeung)}`}>{d.gilHeung}</span>
                 <span className="text-sm text-[var(--mk-ivory-dim)]">{d.score}점</span>
               </div>
@@ -198,7 +198,7 @@ export default function CoupleMusokDashboard({
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between border-b border-[var(--mk-border)] pb-2">
+    <div className="flex flex-col gap-1 border-b border-[var(--mk-border)] pb-2 sm:flex-row sm:items-center sm:justify-between">
       <span className="text-[10px] text-[var(--mk-ivory-muted)]">{label}</span>
       <span className="text-sm text-[var(--mk-ivory)]">{value}</span>
     </div>

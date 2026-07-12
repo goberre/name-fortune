@@ -113,11 +113,11 @@ export default function HanjaPicker({
 
   const cardCls = musok
     ? person === "partner"
-      ? "mk-card border border-[var(--mk-border)] border-l-4 border-l-emerald-600/70 bg-[var(--mk-charcoal)]/80 p-5"
+      ? "mk-card border border-[var(--mk-border)] border-l-4 border-l-emerald-600/70 bg-[var(--mk-charcoal)]/80 p-4 sm:p-5"
       : person === "self"
-        ? "mk-card border border-[var(--mk-border)] border-l-4 border-l-[var(--mk-cinnabar)] bg-[var(--mk-charcoal)]/80 p-5"
-        : "mk-card p-5"
-    : "ap-card p-5";
+        ? "mk-card border border-[var(--mk-border)] border-l-4 border-l-[var(--mk-cinnabar)] bg-[var(--mk-charcoal)]/80 p-4 sm:p-5"
+        : "mk-card p-4 sm:p-5"
+    : "ap-card p-4 sm:p-5";
 
   const roleLabel =
     role === "성" ? "성씨 (姓)" : role === "이름1" ? "이름 (名)" : role === "이름2" ? "이름 (名)" : null;
@@ -230,7 +230,7 @@ export default function HanjaPicker({
                 >
                   <div className="min-w-0 flex-1 pr-2">
                     <div className="flex items-center gap-3">
-                      <span className={`shrink-0 text-2xl font-serif ${musok ? "text-[var(--mk-ivory)]" : active ? "text-white" : "text-neutral-900"}`}>
+                      <span className={`shrink-0 text-xl font-serif sm:text-2xl ${musok ? "text-[var(--mk-ivory)]" : active ? "text-white" : "text-neutral-900"}`}>
                         {c.hanja}
                       </span>
                       <div className="min-w-0">
@@ -266,12 +266,12 @@ export default function HanjaPicker({
           </div>
 
           {hasMore && !expanded && (
-            <button type="button" onClick={() => setExpanded(true)} className={`mt-3 w-full py-2 text-sm ${musok ? "mk-btn mk-btn-ghost" : "text-neutral-500"}`}>
+            <button type="button" onClick={() => setExpanded(true)} className={`mt-3 w-full py-3 text-sm min-h-[44px] ${musok ? "mk-btn mk-btn-ghost" : "text-neutral-500"}`}>
               {filtered.length - 8}개 더 보기
             </button>
           )}
           {expanded && hasMore && (
-            <button type="button" onClick={() => setExpanded(false)} className={`mt-3 w-full py-2 text-sm ${musok ? "mk-btn mk-btn-ghost" : "text-neutral-500"}`}>
+            <button type="button" onClick={() => setExpanded(false)} className={`mt-3 w-full py-3 text-sm min-h-[44px] ${musok ? "mk-btn mk-btn-ghost" : "text-neutral-500"}`}>
               접기
             </button>
           )}

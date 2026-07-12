@@ -43,7 +43,7 @@ export default function MusokDashboard({
           hanja={result.hanjaDisplay}
         />
         {bd && (
-          <p className="mt-3 text-center text-[10px] tracking-wider text-[var(--mk-ivory-muted)]">
+          <p className="mt-3 break-words px-1 text-center text-[11px] tracking-wider text-[var(--mk-ivory-muted)] sm:text-xs">
             {GENDER_LABEL[bd.gender]} · {CALENDAR_LABEL[bd.calendarType]}
             {bd.isLeapMonth ? " · 윤달" : ""} · {bd.year}.{bd.month}.{bd.day}
             {placeLabel ? ` · ${placeLabel}` : ""}

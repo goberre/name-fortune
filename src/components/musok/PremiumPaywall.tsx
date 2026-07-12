@@ -43,7 +43,7 @@ export default function PremiumPaywall({ pairScore, nameA, nameB, children }: Pr
 
   if (testMode) {
     return (
-      <div className="mk-card border border-[var(--mk-cinnabar)]/30 p-6 sm:p-8 text-center">
+      <div className="mk-card border border-[var(--mk-cinnabar)]/30 p-5 text-center sm:p-8">
         <p className="mk-kicker">쌍통 상세 명통 (雙通 詳通)</p>
         <p className="font-musok mt-3 text-lg text-[var(--mk-ivory)]">배우자 궁합 심층 풀이</p>
         <p className="mt-2 text-sm text-[var(--mk-cinnabar-soft)]">{COUPLE_PREMIUM_PRICE_LABEL}</p>

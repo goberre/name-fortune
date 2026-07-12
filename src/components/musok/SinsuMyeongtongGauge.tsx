@@ -30,10 +30,10 @@ export default function SinsuMyeongtongGauge({
   }, [score]);
 
   return (
-    <div className="mk-card mk-card-elevated p-8 text-center sm:p-10">
+    <div className="mk-card mk-card-elevated p-5 text-center sm:p-8 md:p-10">
       <p className="mk-kicker">신수 명통도</p>
-      <p className="font-musok mt-4 text-3xl tracking-widest text-[var(--mk-ivory)] sm:text-4xl">{name}</p>
-      <p className="font-musok mt-2 text-xl text-[var(--mk-cinnabar-soft)]">{hanja}</p>
+      <p className="font-musok mt-4 text-2xl tracking-widest text-[var(--mk-ivory)] sm:text-3xl md:text-4xl">{name}</p>
+      <p className="font-musok mt-2 text-lg text-[var(--mk-cinnabar-soft)] sm:text-xl">{hanja}</p>
 
       <div className="relative mx-auto mt-10 max-w-xs">
         {/* 천 · 지 · 인 */}
@@ -70,7 +70,7 @@ export default function SinsuMyeongtongGauge({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="font-musok text-5xl text-[var(--mk-ivory)]"
+          className="font-musok text-4xl text-[var(--mk-ivory)] sm:text-5xl"
         >
           {display}
         </motion.p>

@@ -22,6 +22,9 @@ body {
   background: var(--mk-charcoal);
   color: var(--mk-ivory);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .font-musok,
@@ -34,6 +37,9 @@ body {
   background: var(--mk-charcoal);
   color: var(--mk-ivory);
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .mk-hanji-texture {
@@ -70,6 +76,11 @@ body {
   font-weight: 600;
   letter-spacing: 0.2em;
   color: var(--mk-cinnabar-soft);
+}
+@media (max-width: 639px) {
+  .mk-kicker {
+    letter-spacing: 0.12em;
+  }
 }
 
 .mk-label {
@@ -108,6 +119,7 @@ body {
   color: var(--mk-ivory);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
+  font-size: 16px;
 }
 .mk-input::placeholder { color: var(--mk-ivory-muted); }
 .mk-input:focus {
@@ -120,21 +132,33 @@ body {
   font-weight: 600;
   letter-spacing: 0.06em;
   transition: opacity 0.15s;
+  min-height: 44px;
+  touch-action: manipulation;
 }
 .mk-btn-primary {
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 0.875rem 1.25rem;
   background: var(--mk-cinnabar);
   color: var(--mk-ivory);
+}
+@media (min-width: 640px) {
+  .mk-btn-primary {
+    padding: 1rem 1.5rem;
+  }
 }
 .mk-btn-primary:hover:not(:disabled) { opacity: 0.9; }
 .mk-btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .mk-btn-ghost {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--mk-border);
   background: transparent;
   color: var(--mk-ivory-dim);
+}
+@media (min-width: 640px) {
+  .mk-btn-ghost {
+    padding: 1rem;
+  }
 }
 .mk-btn-ghost:hover { background: rgba(245, 240, 232, 0.04); }
 
@@ -197,8 +221,13 @@ body {
 
 .mk-premium-blur {
   filter: blur(5px);
-  max-height: 420px;
+  max-height: min(420px, 50vh);
   overflow: hidden;
+}
+@media (min-width: 640px) {
+  .mk-premium-blur {
+    max-height: 420px;
+  }
 }
 
 .font-occult {

@@ -23,9 +23,9 @@ type AppMode = "solo" | "couple";
 type Step = "intro" | 1 | "1b" | 2 | "loading" | "result";
 
 const slide = {
-  initial: (dir: number) => ({ x: dir > 0 ? 32 : -32, opacity: 0 }),
+  initial: (dir: number) => ({ x: dir > 0 ? 16 : -16, opacity: 0 }),
   animate: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -32 : 32, opacity: 0 }),
+  exit: (dir: number) => ({ x: dir > 0 ? -16 : 16, opacity: 0 }),
   transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
 };
 
@@ -433,22 +433,24 @@ export default function SeongmyungApp() {
   const steps = mode === "couple" ? coupleSteps : soloSteps;
 
   return (
-    <div className={`mx-auto max-w-2xl px-5 pb-24 pt-6 ${inkPulse ? "mk-ink-pulse" : ""}`}>
+    <div className={`mx-auto max-w-2xl px-4 pb-24 pb-[max(6rem,env(safe-area-inset-bottom))] pt-4 sm:px-5 sm:pt-6 ${inkPulse ? "mk-ink-pulse" : ""}`}>
       {showStepBar && (
-        <div className="mb-8 flex items-center justify-center gap-2 sm:gap-3">
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-x-1 gap-y-2 sm:mb-8 sm:gap-x-3">
           {steps.map((s, i) => (
-            <div key={s.label} className="flex items-center gap-2 sm:gap-3">
+            <div key={s.label} className="flex items-center gap-1.5 sm:gap-3">
               <span
-                className={`flex h-8 w-8 items-center justify-center font-musok text-sm ${
+                className={`flex h-9 w-9 items-center justify-center font-musok text-sm sm:h-8 sm:w-8 ${
                   stepActive(s.id) ? "mk-step mk-step-active" : stepDone(s.id) ? "mk-step mk-step-done" : "mk-step mk-step-idle"
                 }`}
               >
                 {s.label}
               </span>
-              <span className={`text-xs ${stepActive(s.id) ? "text-[var(--mk-ivory-dim)]" : "text-[var(--mk-ivory-muted)]"}`}>
+              <span
+                className={`hidden text-xs sm:inline ${stepActive(s.id) ? "text-[var(--mk-ivory-dim)]" : "text-[var(--mk-ivory-muted)]"}`}
+              >
                 {s.sub}
               </span>
-              {i < steps.length - 1 && <span className="h-px w-4 sm:w-8 bg-[var(--mk-border)]" />}
+              {i < steps.length - 1 && <span className="h-px w-3 bg-[var(--mk-border)] sm:w-8" />}
             </div>
           ))}
         </div>
@@ -548,7 +550,7 @@ export default function SeongmyungApp() {
               <p className="mt-2 text-xs text-[var(--mk-ivory-muted)]">원획법(原劃法) 획수와 토속 오행 기운을 확인하십시오</p>
             </div>
 
-            <div className={mode === "couple" ? "space-y-3 rounded border border-[var(--mk-cinnabar)]/20 bg-[var(--mk-cinnabar)]/5 p-4" : "space-y-3"}>
+            <div className={mode === "couple" ? "space-y-3 rounded border border-[var(--mk-cinnabar)]/20 bg-[var(--mk-cinnabar)]/5 p-3 sm:p-4" : "space-y-3"}>
               {mode === "couple" && (
                 <div className="flex items-center gap-2 px-1">
                   <span className="rounded border border-[var(--mk-cinnabar)]/40 bg-[var(--mk-cinnabar)]/10 px-2 py-0.5 text-[10px] text-[var(--mk-cinnabar-soft)]">
@@ -573,7 +575,7 @@ export default function SeongmyungApp() {
             </div>
 
             {mode === "couple" && (
-              <div className="space-y-3 rounded border border-emerald-600/25 bg-emerald-950/20 p-4 pt-2">
+              <div className="space-y-3 rounded border border-emerald-600/25 bg-emerald-950/20 p-3 sm:p-4 pt-2">
                 <div className="flex items-center gap-2 px-1">
                   <span className="rounded border border-emerald-600/40 bg-emerald-950/40 px-2 py-0.5 text-[10px] text-emerald-400/90">
                     상대
@@ -598,7 +600,7 @@ export default function SeongmyungApp() {
 
             {error && <p className="text-center text-sm text-[var(--mk-cinnabar-soft)]">{error}</p>}
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <button type="button" onClick={() => goTo(mode === "couple" ? "1b" : 1, -1)} className="mk-btn mk-btn-ghost flex-1">
                 이전
               </button>
@@ -606,7 +608,7 @@ export default function SeongmyungApp() {
                 type="button"
                 onClick={handleAnalyze}
                 disabled={!hanjaAutoFillDone}
-                className="mk-btn mk-btn-primary flex-[2] disabled:cursor-not-allowed disabled:opacity-50"
+                className="mk-btn mk-btn-primary flex-1 sm:flex-[2] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {mode === "couple" ? "쌍통(雙通) 열기" : "신수 명통 열기"}
               </button>

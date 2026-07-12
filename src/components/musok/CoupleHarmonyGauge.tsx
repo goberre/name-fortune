@@ -33,20 +33,20 @@ export default function CoupleHarmonyGauge({
   }, [score]);
 
   return (
-    <div className="mk-card mk-card-elevated p-8 text-center sm:p-10">
+    <div className="mk-card mk-card-elevated p-5 text-center sm:p-8 md:p-10">
       <p className="mk-kicker">신수 쌍통도 (身數 雙通圖)</p>
 
-      <div className="mt-6 flex items-center justify-center gap-4 sm:gap-8">
-        <div>
-          <p className="font-musok text-xl text-[var(--mk-ivory)] sm:text-2xl">{nameA}</p>
+      <div className="mt-6 flex flex-col items-stretch gap-5 sm:flex-row sm:items-center sm:justify-center sm:gap-8">
+        <div className="min-w-0 text-center">
+          <p className="font-musok break-keep text-lg text-[var(--mk-ivory)] sm:text-2xl">{nameA}</p>
           <p className="font-musok text-sm text-[var(--mk-cinnabar-soft)]">{hanjaA}</p>
         </div>
         <div className="flex flex-col items-center">
           <span className="font-musok text-2xl text-[var(--mk-obang)]">合</span>
           <span className="mt-1 text-[10px] text-[var(--mk-ivory-muted)]">궁합</span>
         </div>
-        <div>
-          <p className="font-musok text-xl text-[var(--mk-ivory)] sm:text-2xl">{nameB}</p>
+        <div className="min-w-0 text-center">
+          <p className="font-musok break-keep text-lg text-[var(--mk-ivory)] sm:text-2xl">{nameB}</p>
           <p className="font-musok text-sm text-[var(--mk-cinnabar-soft)]">{hanjaB}</p>
         </div>
       </div>
@@ -75,7 +75,7 @@ export default function CoupleHarmonyGauge({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="font-musok text-5xl text-[var(--mk-ivory)]"
+          className="font-musok text-4xl text-[var(--mk-ivory)] sm:text-5xl"
         >
           {display}
         </motion.p>

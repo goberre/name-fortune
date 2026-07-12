@@ -49,7 +49,7 @@ function Segmented<T extends string>({
           key={opt.id}
           type="button"
           onClick={() => onChange(opt.id)}
-          className={`flex-1 py-2.5 text-sm transition ${
+          className={`flex-1 py-3 text-sm transition min-h-[44px] sm:py-2.5 ${
             value === opt.id
               ? "bg-[var(--mk-ivory)]/10 text-[var(--mk-ivory)]"
               : "text-[var(--mk-ivory-muted)] hover:text-[var(--mk-ivory-dim)]"
@@ -69,9 +69,9 @@ export default function Step1Form(props: Props) {
   const submitLabel = props.submitLabel ?? "명줄 보완(補完)으로 — 字";
 
   return (
-    <form onSubmit={props.onSubmit} className="mk-card p-6 sm:p-10">
+    <form onSubmit={props.onSubmit} className="mk-card p-4 sm:p-6 md:p-10">
       <p className="mk-kicker">{kicker}</p>
-      <h2 className="font-musok mt-2 text-2xl text-[var(--mk-ivory)]">{title}</h2>
+      <h2 className="font-musok mt-2 text-xl text-[var(--mk-ivory)] sm:text-2xl">{title}</h2>
       <p className="mt-2 text-sm text-[var(--mk-ivory-dim)]">{subtitle}</p>
 
       <div className="mt-8">
@@ -87,7 +87,7 @@ export default function Step1Form(props: Props) {
           placeholder="홍길동"
           maxLength={4}
           lang="ko"
-          className="mk-input mt-3 px-5 py-5 text-center font-musok text-3xl tracking-[0.15em]"
+          className="mk-input mt-3 px-4 py-4 text-center font-musok text-2xl tracking-[0.1em] sm:px-5 sm:py-5 sm:text-3xl sm:tracking-[0.15em]"
         />
       </div>
 
@@ -115,12 +115,12 @@ export default function Step1Form(props: Props) {
         />
         {props.calendarType === "lunar" && (
           <>
-            <label className="mt-3 flex items-center gap-2 text-sm text-[var(--mk-ivory-dim)]">
+            <label className="mt-3 flex min-h-[44px] cursor-pointer items-center gap-3 text-sm text-[var(--mk-ivory-dim)]">
               <input
                 type="checkbox"
                 checked={props.isLeapMonth}
                 onChange={(e) => props.setIsLeapMonth(e.target.checked)}
-                className="h-4 w-4"
+                className="h-5 w-5 shrink-0"
               />
               윤달 (閏月)
             </label>
@@ -130,29 +130,32 @@ export default function Step1Form(props: Props) {
             </p>
           </>
         )}
-        <div className="mt-3 grid grid-cols-3 gap-3">
+        <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
           <input
             type="number"
+            inputMode="numeric"
             placeholder="1990"
             value={props.birthYear}
             onChange={(e) => props.setBirthYear(e.target.value.slice(0, 4))}
-            className="mk-input px-4 py-3.5 text-center text-lg"
+            className="mk-input px-3 py-3 text-center text-base sm:px-4 sm:py-3.5 sm:text-lg"
             aria-label="년"
           />
           <input
             type="number"
+            inputMode="numeric"
             placeholder="01"
             value={props.birthMonth}
             onChange={(e) => props.setBirthMonth(e.target.value.slice(0, 2))}
-            className="mk-input px-4 py-3.5 text-center text-lg"
+            className="mk-input px-3 py-3 text-center text-base sm:px-4 sm:py-3.5 sm:text-lg"
             aria-label="월"
           />
           <input
             type="number"
+            inputMode="numeric"
             placeholder="01"
             value={props.birthDay}
             onChange={(e) => props.setBirthDay(e.target.value.slice(0, 2))}
-            className="mk-input px-4 py-3.5 text-center text-lg"
+            className="mk-input px-3 py-3 text-center text-base sm:px-4 sm:py-3.5 sm:text-lg"
             aria-label="일"
           />
         </div>
@@ -169,7 +172,7 @@ export default function Step1Form(props: Props) {
 
       {props.error && <p className="mt-4 text-center text-sm text-[var(--mk-cinnabar-soft)]">{props.error}</p>}
 
-      <button type="submit" disabled={props.name.length < 2} className="mk-btn mk-btn-primary mt-10">
+      <button type="submit" disabled={props.name.length < 2} className="mk-btn mk-btn-primary mt-8 text-sm sm:mt-10 sm:text-base">
         {submitLabel}
       </button>
     </form>

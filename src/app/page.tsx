@@ -9,12 +9,18 @@ export default function HomePage() {
     <div className="mk-body relative min-h-screen">
       <InkBackground />
       <div className="relative">
-        <header className="mx-auto flex max-w-2xl items-center justify-between px-5 py-6">
-          <a href={brandUrls.hub} className="text-xs tracking-widest text-[var(--mk-ivory-muted)] hover:text-[var(--mk-ivory-dim)]">
+        <header className="mx-auto flex max-w-2xl items-center justify-between gap-2 px-4 py-4 sm:px-5 sm:py-6">
+          <a
+            href={brandUrls.hub}
+            className="inline-flex min-h-[44px] min-w-[44px] items-center text-xs tracking-widest text-[var(--mk-ivory-muted)] hover:text-[var(--mk-ivory-dim)]"
+          >
             ← 돌고래
           </a>
-          <span className="font-musok text-xs text-[var(--mk-cinnabar-soft)]">名 · 命 · 數</span>
-          <Link href="/privacy" className="text-xs text-[var(--mk-ivory-muted)] hover:text-[var(--mk-ivory-dim)]">
+          <span className="font-musok shrink-0 text-xs text-[var(--mk-cinnabar-soft)]">名 · 命 · 數</span>
+          <Link
+            href="/privacy"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-end text-xs text-[var(--mk-ivory-muted)] hover:text-[var(--mk-ivory-dim)]"
+          >
             개인정보
           </Link>
         </header>
@@ -27,7 +33,7 @@ export default function HomePage() {
           <SeongmyungApp />
         </main>
 
-        <footer className="mx-auto max-w-2xl px-5 py-12 text-center text-[10px] tracking-[0.2em] text-[var(--mk-ivory-muted)]">
+        <footer className="mx-auto max-w-2xl px-4 py-10 text-center text-[10px] tracking-[0.2em] text-[var(--mk-ivory-muted)] sm:px-5 sm:py-12">
           {siteConfig.brand} · ehfrhfo.com
         </footer>
       </div>

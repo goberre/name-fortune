@@ -16,7 +16,7 @@ export default function IntroMusok({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative flex min-h-[70vh] flex-col items-center justify-center px-6 py-16 text-center"
+      className="relative flex min-h-[60vh] flex-col items-center justify-center px-4 py-12 text-center sm:min-h-[70vh] sm:px-6 sm:py-16"
     >
       <GuaFrame className="absolute opacity-20" />
 
