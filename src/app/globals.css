@@ -8,10 +8,93 @@ body {
     "Pretendard Variable",
     Pretendard,
     sans-serif;
-  background: #07040f;
-  color: #f5f3ff;
+  background: #fafafa;
+  color: #171717;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* ── Apple-style minimal ── */
+.ap-bg {
+  background-color: #fafafa;
+  background-image: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(0, 0, 0, 0.03) 0, transparent 55%);
+}
+
+.ap-card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.ap-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #171717;
+  letter-spacing: -0.01em;
+}
+
+.ap-input {
+  width: 100%;
+  border-radius: 0.875rem;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  color: #171717;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ap-input::placeholder {
+  color: #a3a3a3;
+}
+
+.ap-input:focus {
+  border-color: #a3a3a3;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+.ap-btn {
+  width: 100%;
+  border-radius: 0.875rem;
+  background: #171717;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.ap-btn:hover:not(:disabled) {
+  background: #262626;
+}
+
+.ap-btn:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.ap-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ap-btn-secondary {
+  width: 100%;
+  border-radius: 0.875rem;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #525252;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ap-btn-secondary:hover {
+  background: #fafafa;
+  border-color: #d4d4d4;
+}
+
+/* legacy dark theme (unused) */
 .nf-bg {
   background-color: #07040f;
   background-image:

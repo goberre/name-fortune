@@ -1,10 +1,16 @@
 /** 발음오행 — 초성(자음) 기준 분류 */
+import type { SajuOhengProfile, SourceOhengHarmony } from "@/lib/saju";
+import { analyzeSajuOheng, analyzeSourceOhengHarmony } from "@/lib/saju";
+
 export type Oheng = "목" | "화" | "토" | "금" | "수";
 export type YinYang = "양" | "음";
 export type GilHeung = "길" | "흉" | "평";
 
 export type StrokeSlot = {
   char: string;
+  hanja?: string;
+  hanjaMeaning?: string;
+  sourceOheng?: Oheng;
   strokes: number;
   yinYang: YinYang;
   role: "성" | "이름1" | "이름2";
@@ -29,6 +35,7 @@ export type PronunciationOheng = {
 
 export type SeongmyungResult = {
   name: string;
+  hanjaDisplay: string;
   slots: StrokeSlot[];
   yinYangPattern: YinYang[];
   yinYangGilHeung: GilHeung;
@@ -38,6 +45,10 @@ export type SeongmyungResult = {
   pronunciationGilHeung: GilHeung;
   pronunciationSummary: string;
   sagyeok: SagyeokGrid[];
+  birthDate?: { year: number; month: number; day: number };
+  sajuProfile?: SajuOhengProfile;
+  sourceOheng?: Oheng[];
+  sourceOhengHarmony?: SourceOhengHarmony;
   birthOheng?: Oheng;
   birthSummary?: string;
   totalScore: number;
@@ -306,12 +317,16 @@ export function computeTotalScore(
   yinYang: GilHeung,
   pronunciation: GilHeung,
   sagyeok: SagyeokGrid[],
+  sourceHarmony?: GilHeung,
 ): number {
   let score = 0;
-  score += scoreGilHeung(yinYang) * 25;
-  score += scoreGilHeung(pronunciation) * 25;
+  score += scoreGilHeung(yinYang) * 22;
+  score += scoreGilHeung(pronunciation) * 22;
   for (const s of sagyeok) {
-    score += scoreGilHeung(s.gilHeung) * 12.5;
+    score += scoreGilHeung(s.gilHeung) * 11;
+  }
+  if (sourceHarmony) {
+    score += scoreGilHeung(sourceHarmony) * 12;
   }
   return Math.round(Math.min(100, Math.max(0, score)));
 }
@@ -328,10 +343,18 @@ export function isValidKoreanName(name: string): boolean {
   return t.length >= 2 && t.length <= 4 && /^[가-힣]+$/.test(t);
 }
 
+export type HanjaSlotInput = {
+  hangul: string;
+  hanja: string;
+  meaning: string;
+  oheng: Oheng;
+  wonStrokes: number;
+};
+
 export type AnalyzeInput = {
   name: string;
-  strokes: number[];
-  birthYear?: number;
+  hanjaSlots: HanjaSlotInput[];
+  birthDate?: { year: number; month: number; day: number };
 };
 
 export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
@@ -339,9 +362,11 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
   if (!isValidKoreanName(name)) throw new Error("2~4글자 한글 이름을 입력해 주세요.");
 
   const chars = [...name];
-  if (input.strokes.length !== chars.length) {
-    throw new Error("각 글자별 획수를 입력해 주세요.");
+  if (input.hanjaSlots.length !== chars.length) {
+    throw new Error("각 글자별 한자를 선택해 주세요.");
   }
+
+  const strokes = input.hanjaSlots.map((s) => s.wonStrokes);
 
   const roles: StrokeSlot["role"][] =
     chars.length === 2
@@ -352,29 +377,44 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
 
   const slots: StrokeSlot[] = chars.map((char, i) => ({
     char,
-    strokes: input.strokes[i],
-    yinYang: strokeToYinYang(input.strokes[i]),
+    hanja: input.hanjaSlots[i].hanja,
+    hanjaMeaning: input.hanjaSlots[i].meaning,
+    sourceOheng: input.hanjaSlots[i].oheng,
+    strokes: input.hanjaSlots[i].wonStrokes,
+    yinYang: strokeToYinYang(input.hanjaSlots[i].wonStrokes),
     role: roles[i],
   }));
 
-  const { A, B, C } = parseNameStructure(name, input.strokes);
+  const hanjaDisplay = input.hanjaSlots.map((s) => s.hanja).join("");
+  const sourceOheng = input.hanjaSlots.map((s) => s.oheng);
+
+  const { A, B, C } = parseNameStructure(name, strokes);
   const yinYang = analyzeYinYang(slots);
   const pronunciation = analyzePronunciation(name);
   const sagyeok = computeSagyeok(A, B, C);
-  const totalScore = computeTotalScore(yinYang.gilHeung, pronunciation.gilHeung, sagyeok);
 
+  let sajuProfile: SajuOhengProfile | undefined;
+  let sourceOhengHarmony: SourceOhengHarmony | undefined;
   let birthOheng: Oheng | undefined;
   let birthSummary: string | undefined;
-  if (input.birthYear && input.birthYear >= 1900 && input.birthYear <= 2100) {
-    birthOheng = birthYearOheng(input.birthYear);
-    const lacking = pronunciation.flow.filter((o) => o !== birthOheng);
-    birthSummary = `출생년 ${input.birthYear}년의 자원오행은 ${birthOheng}(${OHENG_LABEL[birthOheng]})입니다. 이름 오행과 조화를 이루면 운의 시너지가 커집니다.${
-      lacking.length ? "" : " 이름과 자원오행이 잘 맞는 편입니다."
-    }`;
+
+  if (input.birthDate) {
+    sajuProfile = analyzeSajuOheng(input.birthDate);
+    sourceOhengHarmony = analyzeSourceOhengHarmony(sajuProfile, sourceOheng);
+    birthOheng = sajuProfile.yearOheng;
+    birthSummary = sajuProfile.summary;
   }
+
+  const totalScore = computeTotalScore(
+    yinYang.gilHeung,
+    pronunciation.gilHeung,
+    sagyeok,
+    sourceOhengHarmony?.gilHeung,
+  );
 
   return {
     name,
+    hanjaDisplay,
     slots,
     yinYangPattern: yinYang.pattern,
     yinYangGilHeung: yinYang.gilHeung,
@@ -384,6 +424,10 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
     pronunciationGilHeung: pronunciation.gilHeung,
     pronunciationSummary: pronunciation.summary,
     sagyeok,
+    birthDate: input.birthDate,
+    sajuProfile,
+    sourceOheng,
+    sourceOhengHarmony,
     birthOheng,
     birthSummary,
     totalScore,

@@ -11,7 +11,7 @@ export default function ScoreGauge({ score, grade }: { score: number; grade: str
 
   useEffect(() => {
     const start = performance.now();
-    const dur = 1200;
+    const dur = 1400;
     const tick = (now: number) => {
       const p = Math.min(1, (now - start) / dur);
       setDisplay(Math.round(score * (1 - Math.pow(1 - p, 3))));
@@ -22,42 +22,36 @@ export default function ScoreGauge({ score, grade }: { score: number; grade: str
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.92 }}
+      initial={{ opacity: 0, scale: 0.94 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.5 }}
       className="flex flex-col items-center"
     >
-      <div className="relative h-36 w-36">
+      <div className="relative h-40 w-40">
         <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r={r} fill="none" stroke="rgba(139,92,246,0.15)" strokeWidth="8" />
+          <circle cx="60" cy="60" r={r} fill="none" stroke="#e5e5e5" strokeWidth="7" />
           <motion.circle
             cx="60"
             cy="60"
             r={r}
             fill="none"
-            stroke="url(#gaugeGrad)"
-            strokeWidth="8"
+            stroke="#171717"
+            strokeWidth="7"
             strokeLinecap="round"
             strokeDasharray={c}
             strokeDashoffset={offset}
             initial={{ strokeDashoffset: c }}
             animate={{ strokeDashoffset: offset }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
+            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
           />
-          <defs>
-            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#a78bfa" />
-              <stop offset="100%" stopColor="#f472b6" />
-            </linearGradient>
-          </defs>
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-semibold text-white">{display}</span>
-          <span className="text-xs text-white/40">/ 100</span>
+          <span className="text-4xl font-semibold tracking-tight text-neutral-900">{display}</span>
+          <span className="text-xs text-neutral-400">/ 100</span>
         </div>
       </div>
-      <p className="mt-3 text-sm font-medium text-violet-200">{grade}</p>
-      <p className="text-xs text-white/35">종합 성명학 점수</p>
+      <p className="mt-4 text-base font-semibold text-neutral-900">{grade}</p>
+      <p className="text-xs text-neutral-500">종합 성명학 점수</p>
     </motion.div>
   );
 }
