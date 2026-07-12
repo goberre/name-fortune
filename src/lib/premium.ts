@@ -2,6 +2,11 @@ import { brandUrls } from "@/config/brand";
 
 const STORAGE_KEY = "name-fortune-couple-premium";
 
+/** 테스트 중이면 결제하기 → 즉시 잠금 해제 (실결제 없음) */
+export function isCouplePremiumTestMode(): boolean {
+  return process.env.NEXT_PUBLIC_COUPLE_PREMIUM_TEST !== "0";
+}
+
 export function isCouplePremiumUnlocked(): boolean {
   if (typeof window === "undefined") return false;
   if (sessionStorage.getItem(STORAGE_KEY) === "1") return true;

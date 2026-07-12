@@ -106,16 +106,7 @@ export default function CoupleMusokDashboard({
 
       {/* 유료 상세 */}
       <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
-        <PremiumPaywall
-          pairScore={result.pairScore}
-          nameA={personA.name}
-          nameB={personB.name}
-          teaser={
-            <p className="mb-2 text-center text-[10px] text-[var(--mk-ivory-muted)]">
-              아래는 상세 궁합 명통 미리보기입니다
-            </p>
-          }
-        >
+        <PremiumPaywall pairScore={result.pairScore} nameA={personA.name} nameB={personB.name}>
           <div className="space-y-6 p-2">
             <section className="mk-card p-6">
               <p className="mk-kicker">사주·이름 교차 조화</p>
