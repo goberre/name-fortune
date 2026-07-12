@@ -163,7 +163,7 @@ export default function Step1Form(props: Props) {
           ))}
         </select>
         <p className="mt-2 text-xs text-neutral-400">
-          태생지의 방위·지형 기운(지기)이 사주와 이름 풀이에 반영됩니다
+          태생지의 방위·지형 기운(지기)이 <strong>앞으로의 운</strong>과 이름 풀이에 반영됩니다
         </p>
       </div>
 

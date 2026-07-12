@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import EasyTip from "@/components/infographics/EasyTip";
 import KoreaRegionChart from "@/components/infographics/KoreaRegionChart";
+import WhyRegionMatters from "@/components/infographics/WhyRegionMatters";
 import { OhengBadge } from "@/components/seongmyung/HanjaPicker";
 import type { BirthRegionAnalysis } from "@/lib/birth-region";
 
@@ -26,18 +27,15 @@ export default function BirthRegionPanel({ analysis }: { analysis: BirthRegionAn
     >
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-neutral-900">태생지 · 고향의 기운</h3>
-          <p className="mt-1 text-sm text-neutral-500">태어난 곳의 방위와 지형이 운명의 뿌리에 미치는 영향</p>
+          <h3 className="text-base font-semibold text-neutral-900">태생지 · 고향이 미래에 미치는 영향</h3>
+          <p className="mt-1 text-sm text-neutral-500">왜 태어난 곳이 중요한지, 앞으로 어느 방향이 열리는지</p>
         </div>
         <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${statusColor}`}>
           {gilHeung}
         </span>
       </div>
 
-      <EasyTip>
-        사람은 <strong>어디서 태어났는지</strong>도 중요합니다. 동쪽은 성장(목), 남쪽은 열정(화), 서쪽은
-        결단(금), 중앙은 안정(토)의 기운을 받는다고 봅니다. 고향 = 인생의 &apos;뿌리&apos;입니다.
-      </EasyTip>
+      <WhyRegionMatters />
 
       <div className="mt-5">
         <KoreaRegionChart region={region} />
@@ -51,7 +49,7 @@ export default function BirthRegionPanel({ analysis }: { analysis: BirthRegionAn
 
       <div className="mb-5 mt-5">
         <div className="mb-2 flex justify-between text-xs text-neutral-500">
-          <span>고향 ↔ 사주·이름 조화</span>
+          <span>고향 ↔ 앞으로의 운 조화</span>
           <span className="font-semibold text-neutral-900">{matchScore}점</span>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100">
@@ -64,14 +62,18 @@ export default function BirthRegionPanel({ analysis }: { analysis: BirthRegionAn
         </div>
       </div>
 
+      <EasyTip title="앞으로의 방향">
+        {analysis.futureGuide}
+      </EasyTip>
+
       {(analysis.fillsLacking.length > 0 || analysis.matchesUseful.length > 0) && (
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           {analysis.fillsLacking.map((o) => (
             <span
               key={`region-fill-${o}`}
               className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200"
             >
-              고향 {o}행 → 사주 보완
+              고향 {o}행 → 앞으로의 운 보완
             </span>
           ))}
           {analysis.matchesUseful.map((o) => (
@@ -85,7 +87,7 @@ export default function BirthRegionPanel({ analysis }: { analysis: BirthRegionAn
         </div>
       )}
 
-      <p className="text-sm leading-relaxed text-neutral-700">{analysis.summary}</p>
+      <p className="mt-4 text-sm leading-relaxed text-neutral-700">{analysis.summary}</p>
     </motion.div>
   );
 }

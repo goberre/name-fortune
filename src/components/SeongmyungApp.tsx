@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import AnalysisPanels from "@/components/seongmyung/AnalysisPanels";
 import ResultGuidePanel from "@/components/infographics/ResultGuidePanel";
 import BirthRegionPanel from "@/components/seongmyung/BirthRegionPanel";
+import FutureFortunePanel from "@/components/seongmyung/FutureFortunePanel";
 import HanjaPicker from "@/components/seongmyung/HanjaPicker";
 import OhengHarmonyPanel from "@/components/seongmyung/OhengHarmonyPanel";
 import SagyeokTimeline from "@/components/seongmyung/SagyeokTimeline";
@@ -325,6 +326,21 @@ export default function SeongmyungApp() {
                 </div>
               </motion.div>
 
+              {result.futureFortune && (
+                <motion.div variants={fadeUp}>
+                  <FutureFortunePanel fortune={result.futureFortune} />
+                </motion.div>
+              )}
+
+              <motion.div variants={fadeUp}>
+                <SagyeokTimeline
+                  grids={result.sagyeok}
+                  birthYear={result.birthDate?.year}
+                  birthMonth={result.birthDate?.month}
+                  birthDay={result.birthDate?.day}
+                />
+              </motion.div>
+
               {result.birthRegionAnalysis && (
                 <motion.div variants={fadeUp}>
                   <BirthRegionPanel analysis={result.birthRegionAnalysis} />
@@ -352,10 +368,6 @@ export default function SeongmyungApp() {
                   pronunciationGilHeung={result.pronunciationGilHeung}
                   pronunciationSummary={result.pronunciationSummary}
                 />
-              </motion.div>
-
-              <motion.div variants={fadeUp}>
-                <SagyeokTimeline grids={result.sagyeok} />
               </motion.div>
 
               <motion.div variants={fadeUp}>

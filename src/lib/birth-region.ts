@@ -39,6 +39,20 @@ const DIRECTION_LABEL: Record<BirthRegion["direction"], string> = {
   중: "중앙",
 };
 
+const FUTURE_DIRECTION: Record<BirthRegion["direction"], string> = {
+  동: "동쪽 방향(강원·경북·부산 등)으로의 이동·활동, 새로운 시작에 유리한 흐름입니다.",
+  서: "서쪽 방향(인천·충남·전북 등)으로의 변화·결단이 운을 열 수 있습니다.",
+  남: "남쪽 방향(전남·경남·제주 등)으로의 확장·도전이 기운을 살립니다.",
+  북: "북쪽 방향의 안정·축적이 장기적으로 도움이 됩니다.",
+  중: "중심지·거점 도시에서의 활동과 네트워크가 미래 운을 키웁니다.",
+};
+
+const WHY_REGION = [
+  "태어날 때 그 땅의 방위·지형 기운(지기)이 평생 성향과 운의 방향을 잡습니다.",
+  "생년월일(사주)만으로는 부족한 오행을 고향 기운이 보완하거나 약화시킬 수 있습니다.",
+  "이름 한자와 고향 기운이 맞으면 뿌리·이름·운명이 한 줄로 연결됩니다.",
+] as const;
+
 const OHENG_GENERATES: Record<Oheng, Oheng> = {
   목: "화",
   화: "토",
@@ -60,6 +74,8 @@ export type BirthRegionAnalysis = {
   summary: string;
   terrainGuide: string;
   directionGuide: string;
+  whyImportant: string[];
+  futureGuide: string;
 };
 
 export function analyzeBirthRegionHarmony(
@@ -124,6 +140,13 @@ export function analyzeBirthRegionHarmony(
     summary += ` 일간 ${dayOheng}행이 태생지 ${region.oheng}행을 키워, 고향과의 인연이 깊습니다.`;
   }
 
+  let futureGuide = `앞으로 ${FUTURE_DIRECTION[region.direction]} `;
+  if (fillsLacking.length > 0 || nameHasRegionOheng) {
+    futureGuide += `고향 ${region.oheng}행과 이름이 맞물려, 이 방향으로 나아갈 때 운이 더욱 따릅니다.`;
+  } else {
+    futureGuide += `이름 한자의 기운과 함께 이 방향을 참고해 보세요.`;
+  }
+
   return {
     region,
     gilHeung,
@@ -133,5 +156,7 @@ export function analyzeBirthRegionHarmony(
     summary,
     terrainGuide,
     directionGuide,
+    whyImportant: [...WHY_REGION],
+    futureGuide,
   };
 }

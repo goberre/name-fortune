@@ -3,6 +3,7 @@ import type { BirthProfile } from "@/types/birth";
 import type { SajuOhengProfile, SourceOhengHarmony } from "@/lib/saju";
 import { analyzeSajuOheng, analyzeSourceOhengHarmony } from "@/lib/saju";
 import { analyzeBirthRegionHarmony, type BirthRegionAnalysis } from "@/lib/birth-region";
+import { buildFutureFortune, type FutureFortuneSummary } from "@/lib/future-fortune";
 
 export type Oheng = "목" | "화" | "토" | "금" | "수";
 export type YinYang = "양" | "음";
@@ -59,6 +60,7 @@ export type SeongmyungResult = {
   sourceOheng?: Oheng[];
   sourceOhengHarmony?: SourceOhengHarmony;
   birthRegionAnalysis?: BirthRegionAnalysis;
+  futureFortune?: FutureFortuneSummary;
   birthOheng?: Oheng;
   birthSummary?: string;
   totalScore: number;
@@ -285,20 +287,20 @@ export function analyzePronunciation(name: string): {
 
 const SAGYEOK_GUIDE = {
   won: {
-    plainGuide: "이름(名) 부분의 획수로, 어릴 때부터 청소년기까지의 기초 운세입니다.",
-    lifeGuide: "학업, 가족 관계, 성격 형성, 첫사회 진입 전까지의 흐름을 봅니다. '태어나서 자라는 과정'의 운이라고 생각하시면 됩니다.",
+    plainGuide: "이름(名) 획수로 보는 초년 운입니다. 이미 지나간 시기이므로 참고용으로 보시면 됩니다.",
+    lifeGuide: "어릴 때 학업·가족·성격 형성의 흐름을 나타냅니다. 앞으로의 운을 보려면 형격·이격·정격을 확인해 주세요.",
   },
   hyung: {
-    plainGuide: "성(姓)과 이름 첫 글자 획수를 더한 값으로, 인생에서 가장 중요한 '주운(主運)'입니다.",
-    lifeGuide: "20~40대 사회생활, 직업, 배우자, 자립의 핵심 시기입니다. 성명학에서 가장 비중을 두는 운세입니다.",
+    plainGuide: "성(姓)+이름 첫 글자 획수로 보는 청년기 '주운(主運)'입니다.",
+    lifeGuide: "앞으로 21~40대 직업·연애·결혼·사회 진출에 직접 영향을 줍니다. 가장 중요하게 보는 미래 운입니다.",
   },
   i: {
-    plainGuide: "성(姓)과 이름 둘째 글자 획수를 더한 값으로, 중년기 가정·사회적 역할의 운세입니다.",
-    lifeGuide: "40~60대 가정 화목, 자녀, 사회적 지위, 리더십 발휘 시기입니다. '사회의 중심에 서는 시기' 운입니다.",
+    plainGuide: "성+이름 둘째 글자 획수로 보는 중년기 운입니다.",
+    lifeGuide: "앞으로 41~60대 가정·재물·사회적 역할·리더십 시기의 흐름을 예고합니다.",
   },
   jeong: {
-    plainGuide: "성+이름 전체 획수를 합한 값으로, 말년과 인생 전체를 아우르는 총운입니다.",
-    lifeGuide: "60대 이후 노후, 건강, 명예, 인생을 돌아보는 시기입니다. 이름이 이끄는 최종 결실을 의미합니다.",
+    plainGuide: "성+이름 전체 획수로 보는 말년·총운입니다.",
+    lifeGuide: "앞으로 61세 이후 노후·건강·명예, 그리고 인생 전체의 최종 결실을 보여줍니다.",
   },
 } as const;
 
@@ -477,6 +479,7 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
   let sajuProfile: SajuOhengProfile | undefined;
   let sourceOhengHarmony: SourceOhengHarmony | undefined;
   let birthRegionAnalysis: BirthRegionAnalysis | undefined;
+  let futureFortune: FutureFortuneSummary | undefined;
   let birthOheng: Oheng | undefined;
   let birthSummary: string | undefined;
 
@@ -484,6 +487,7 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
     sajuProfile = analyzeSajuOheng(input.birth);
     sourceOhengHarmony = analyzeSourceOhengHarmony(sajuProfile, sourceOheng);
     birthRegionAnalysis = analyzeBirthRegionHarmony(input.birth.birthRegion, sajuProfile, sourceOheng);
+    futureFortune = buildFutureFortune(input.birth, sagyeok);
     birthOheng = sajuProfile.dayOheng;
     birthSummary = sajuProfile.summary;
   }
@@ -516,6 +520,7 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
     sourceOheng,
     sourceOhengHarmony,
     birthRegionAnalysis,
+    futureFortune,
     birthOheng,
     birthSummary,
     totalScore,

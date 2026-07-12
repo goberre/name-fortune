@@ -1,9 +1,10 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import EasyTip from "@/components/infographics/EasyTip";
 import SagyeokLifeChart from "@/components/infographics/SagyeokLifeChart";
+import { calcAge, defaultSagyeokIndex, isPastStage, stageForAge } from "@/lib/future-fortune";
 import type { GilHeung, SagyeokGrid } from "@/lib/seongmyung";
 
 function StatusBadge({ gilHeung }: { gilHeung: GilHeung }) {
@@ -17,17 +18,34 @@ function StatusBadge({ gilHeung }: { gilHeung: GilHeung }) {
 }
 
 const TAB_HINT: Record<string, string> = {
-  won: "어릴 때 · 학업·성장",
-  hyung: "★ 주운 · 직업·배우자",
-  i: "중년 · 가정·사회",
-  jeong: "말년 · 건강·총운",
+  won: "지나간 시기 · 참고용",
+  hyung: "★ 지금~앞으로 · 직업·연애",
+  i: "앞으로 · 가정·재물",
+  jeong: "앞으로 · 노후·총운",
 };
 
 const GIL_LABEL = { 길: "좋은 흐름", 흉: "주의 필요", 평: "무난한 흐름" } as const;
 
-export default function SagyeokTimeline({ grids }: { grids: SagyeokGrid[] }) {
-  const [active, setActive] = useState(0);
+export default function SagyeokTimeline({
+  grids,
+  birthYear,
+  birthMonth,
+  birthDay,
+}: {
+  grids: SagyeokGrid[];
+  birthYear?: number;
+  birthMonth?: number;
+  birthDay?: number;
+}) {
+  const age = useMemo(() => {
+    if (!birthYear || !birthMonth || !birthDay) return undefined;
+    return calcAge({ year: birthYear, month: birthMonth, day: birthDay });
+  }, [birthYear, birthMonth, birthDay]);
+
+  const defaultIdx = age !== undefined ? defaultSagyeokIndex(age) : 1;
+  const [active, setActive] = useState(defaultIdx);
   const g = grids[active];
+  const currentStage = age !== undefined ? stageForAge(age) : undefined;
 
   return (
     <motion.div
@@ -36,32 +54,43 @@ export default function SagyeokTimeline({ grids }: { grids: SagyeokGrid[] }) {
       transition={{ delay: 0.25 }}
       className="ap-card p-6 sm:p-8"
     >
-      <h3 className="text-base font-semibold text-neutral-900">사격 · 인생 4단계 운세</h3>
-      <p className="mt-1 text-sm text-neutral-500">이름 한자 획수로 보는 시기별 운</p>
+      <h3 className="text-base font-semibold text-neutral-900">사격 · 앞으로의 인생 운세</h3>
+      <p className="mt-1 text-sm text-neutral-500">
+        {age !== undefined ? `현재 ${age}세 · 지금부터 펼쳐질 운을 중심으로 봅니다` : "이름 한자 획수로 보는 시기별 운"}
+      </p>
 
-      <EasyTip title="한 줄 요약">
-        이름 한자 <strong>몇 획인지</strong>를 더해서, 어릴 때 → 청년 → 중년 → 말년 네 구간의 운이
-        좋은지(길) 나쁜지(흉)를 봅니다. <strong>형격(★)</strong>이 가장 중요합니다.
+      <EasyTip title="미래 중심으로 보기">
+        과거(어릴 때)보다 <strong>지금·앞으로</strong>가 궁금하시죠? 형격(21~40세) · 이격(41~60세) ·
+        정격(61세~)을 중점적으로 확인해 주세요. 원격(1~20세)은 이미 지난 흐름입니다.
       </EasyTip>
 
       <div className="mt-5">
-        <SagyeokLifeChart grids={grids} activeKey={g.key} onSelect={setActive} />
+        <SagyeokLifeChart
+          grids={grids}
+          activeKey={g.key}
+          currentStage={currentStage}
+          onSelect={setActive}
+        />
       </div>
 
       <div className="mt-6 flex gap-1 rounded-xl bg-neutral-100 p-1">
-        {grids.map((grid, i) => (
-          <button
-            key={grid.key}
-            type="button"
-            onClick={() => setActive(i)}
-            className={`flex-1 rounded-lg py-2.5 text-xs font-medium transition sm:text-sm ${
-              active === i ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500 hover:text-neutral-700"
-            }`}
-          >
-            {grid.label}
-            {grid.key === "hyung" && " ★"}
-          </button>
-        ))}
+        {grids.map((grid, i) => {
+          const isPast = currentStage ? isPastStage(grid.key as "won" | "hyung" | "i" | "jeong", currentStage) : false;
+          return (
+            <button
+              key={grid.key}
+              type="button"
+              onClick={() => setActive(i)}
+              className={`flex-1 rounded-lg py-2.5 text-xs font-medium transition sm:text-sm ${
+                active === i ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500 hover:text-neutral-700"
+              } ${isPast ? "opacity-50" : ""}`}
+            >
+              {grid.label}
+              {grid.key === "hyung" && " ★"}
+              {grid.key === currentStage && " ·지금"}
+            </button>
+          );
+        })}
       </div>
 
       <AnimatePresence mode="wait">
@@ -75,15 +104,20 @@ export default function SagyeokTimeline({ grids }: { grids: SagyeokGrid[] }) {
         >
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xl font-semibold text-neutral-900">{g.label}</span>
+            {g.key === currentStage && (
+              <span className="rounded-full bg-neutral-900 px-2 py-0.5 text-[10px] font-bold text-white">지금</span>
+            )}
+            {g.key === "won" && currentStage && isPastStage(g.key, currentStage) && (
+              <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-[10px] text-neutral-500">지나감</span>
+            )}
             <StatusBadge gilHeung={g.gilHeung} />
             <span className="text-xs text-neutral-400">{TAB_HINT[g.key]}</span>
           </div>
           <p className="mt-1 text-xs text-neutral-400">{g.period}</p>
 
           <div className="mt-4 rounded-lg border border-neutral-200/80 bg-white px-4 py-3">
-            <p className="text-xs font-medium text-neutral-500">어떻게 계산하나요?</p>
+            <p className="text-xs font-medium text-neutral-500">획수 계산</p>
             <p className="mt-1 text-sm font-medium text-neutral-900">{g.formula}</p>
-            <p className="mt-1 text-[10px] text-neutral-400">↑ 한자 획수를 더한 뒤 81수리 길흉표로 변환</p>
           </div>
 
           <div className="mt-4 flex items-baseline gap-2">
@@ -99,17 +133,6 @@ export default function SagyeokTimeline({ grids }: { grids: SagyeokGrid[] }) {
           </p>
         </motion.div>
       </AnimatePresence>
-
-      <dl className="info-glossary mt-6">
-        <div>
-          <dt>81수리란?</dt>
-          <dd>획수를 1~81 숫자로 환산해 길·흉을 판단하는 전통 수리표입니다.</dd>
-        </div>
-        <div>
-          <dt>형격(★)이 왜 중요한가요?</dt>
-          <dd>20~40대 직업·결혼·사회생활 등 인생의 핵심 시기를 나타내는 &apos;주운&apos;이기 때문입니다.</dd>
-        </div>
-      </dl>
     </motion.div>
   );
 }
