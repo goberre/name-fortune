@@ -41,10 +41,12 @@ function OhengChart({ count }: { count: Record<Oheng, number> }) {
 
 function ResultCard({ result }: { result: NameAnalysis }) {
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-950/80 to-indigo-950/60 p-6 text-center backdrop-blur-xl">
-        <p className="text-sm text-violet-300">이름 풀이 결과</p>
-        <p className="mt-2 text-4xl font-bold tracking-widest text-white">{result.name}</p>
+    <div className="myst-result-enter space-y-6">
+      <div className="myst-card myst-card-glow rounded-2xl p-6 text-center backdrop-blur-xl">
+        <p className="myst-whisper text-xs text-emerald-400/70">운명의 판이 열렸습니다</p>
+        <p className="mt-3 text-4xl font-bold tracking-widest text-white drop-shadow-[0_0_12px_rgba(167,139,250,0.6)]">
+          {result.name}
+        </p>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           <span
             className="rounded-full px-4 py-1 text-sm font-bold"
@@ -62,13 +64,15 @@ function ResultCard({ result }: { result: NameAnalysis }) {
         <p className="mt-4 text-sm leading-relaxed text-white/70">{result.summary}</p>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-        <h3 className="mb-4 text-sm font-semibold text-violet-200">글자별 오행</h3>
+      <div className="myst-card rounded-2xl p-5 backdrop-blur-sm">
+        <h3 className="mb-4 text-sm font-semibold text-violet-200/90">
+          <span className="text-emerald-400/60">◆</span> 글자별 오행
+        </h3>
         <div className="flex flex-wrap justify-center gap-3">
           {result.syllables.map((s) => (
             <div
               key={s.char}
-              className="flex flex-col items-center rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+              className="flex flex-col items-center rounded-xl border border-violet-500/20 bg-black/40 px-4 py-3 shadow-[0_0_16px_rgba(139,92,246,0.1)]"
             >
               <span className="text-2xl font-bold text-white">{s.char}</span>
               <span className="mt-1 text-xs" style={{ color: OHENG_COLORS[s.oheng] }}>
@@ -79,12 +83,14 @@ function ResultCard({ result }: { result: NameAnalysis }) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-        <h3 className="mb-4 text-sm font-semibold text-violet-200">오행 균형</h3>
+      <div className="myst-card rounded-2xl p-5 backdrop-blur-sm">
+        <h3 className="mb-4 text-sm font-semibold text-violet-200/90">
+          <span className="text-emerald-400/60">◆</span> 오행 균형
+        </h3>
         <OhengChart count={result.ohengCount} />
         {result.lacking.length > 0 && (
-          <p className="mt-4 text-center text-xs text-amber-300/80">
-            부족한 기운: {result.lacking.join(", ")}
+          <p className="mt-4 text-center text-xs text-amber-400/70">
+            ⚠ 부족한 기운: {result.lacking.join(", ")}
           </p>
         )}
       </div>
@@ -101,15 +107,17 @@ function ResultCard({ result }: { result: NameAnalysis }) {
       ).map(([title, body]) => (
         <div
           key={title}
-          className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+          className="myst-card rounded-2xl p-5 backdrop-blur-sm"
         >
-          <h3 className="text-sm font-semibold text-violet-200">{title}</h3>
+          <h3 className="text-sm font-semibold text-violet-200/90">
+            <span className="text-emerald-400/50">◇</span> {title}
+          </h3>
           <p className="mt-2 text-sm leading-relaxed text-white/65">{body}</p>
         </div>
       ))}
 
-      <p className="text-center text-xs text-white/30">
-        참고용 풀이입니다. 성명학·오행 해석은 전통적 기준을 바탕으로 한 간편 분석입니다.
+      <p className="text-center text-xs text-white/25">
+        참고용 풀이입니다 · 성명학·오행 해석은 전통적 기준을 바탕으로 한 간편 분석
       </p>
     </div>
   );
@@ -156,8 +164,8 @@ export default function NameFortuneApp() {
     <div className="mx-auto max-w-lg px-4 pb-16">
       {!result && (
         <form onSubmit={handleSubmit} className="mt-8">
-          <label htmlFor="name" className="block text-center text-sm text-violet-200/80">
-            이름을 입력하세요
+          <label htmlFor="name" className="block text-center text-sm text-violet-200/70">
+            <span className="text-emerald-400/50">◈</span> 이름을 속삭이듯 입력하세요
           </label>
           <input
             id="name"
@@ -178,16 +186,16 @@ export default function NameFortuneApp() {
             lang="ko"
             inputMode="text"
             enterKeyHint="go"
-            className="mt-4 w-full rounded-2xl border border-violet-400/30 bg-black/30 px-6 py-5 text-center text-3xl font-bold tracking-[0.3em] text-white placeholder:text-white/20 outline-none transition focus:border-violet-400/60 focus:ring-2 focus:ring-violet-500/30"
+            className="myst-input mt-4 w-full rounded-2xl px-6 py-5 text-center text-3xl font-bold tracking-[0.3em] text-white placeholder:text-white/15 outline-none transition"
           />
-          <p className="mt-2 text-center text-xs text-white/35">2~4글자 한글 · 성만 또는 이름 전체</p>
-          {error && <p className="mt-3 text-center text-sm text-rose-400">{error}</p>}
+          <p className="mt-2 text-center text-xs text-white/30">2~4글자 한글 · 성만 또는 이름 전체</p>
+          {error && <p className="mt-3 text-center text-sm text-rose-400/90">{error}</p>}
           <button
             type="submit"
             disabled={!canSubmit}
-            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-4 text-base font-semibold text-white shadow-lg shadow-violet-900/40 transition hover:from-violet-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="myst-btn mt-6 w-full rounded-2xl py-4 text-base font-semibold text-white/95 transition disabled:cursor-not-allowed disabled:opacity-40"
           >
-            이름으로 풀어보기
+            운명 풀어보기
           </button>
         </form>
       )}
@@ -201,7 +209,7 @@ export default function NameFortuneApp() {
               setResult(null);
               setName("");
             }}
-            className="mt-8 w-full rounded-xl border border-white/15 py-3 text-sm text-white/60 transition hover:bg-white/5"
+            className="mt-8 w-full rounded-xl border border-violet-500/20 py-3 text-sm text-white/50 transition hover:border-violet-400/30 hover:bg-violet-950/30 hover:text-violet-200/80"
           >
             다른 이름 풀기
           </button>

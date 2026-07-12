@@ -8,7 +8,7 @@ import "./globals.css";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#1e1035",
+  themeColor: "#030208",
 };
 
 export const metadata: Metadata = {
