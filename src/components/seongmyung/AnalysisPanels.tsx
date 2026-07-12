@@ -1,9 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import EasyTip from "@/components/infographics/EasyTip";
+import OhengCycleChart from "@/components/infographics/OhengCycleChart";
+import YinYangChart from "@/components/infographics/YinYangChart";
 import OhengFlowChart from "@/components/seongmyung/OhengFlowChart";
 import { OhengBadge } from "@/components/seongmyung/HanjaPicker";
-import YinYangBalance from "@/components/seongmyung/YinYangBalance";
 import type { GilHeung, Oheng, PronunciationOheng, StrokeSlot, YinYang } from "@/lib/seongmyung";
 
 function Badge({ status }: { status: GilHeung }) {
@@ -36,6 +38,7 @@ export default function AnalysisPanels({
   pronunciationSummary: string;
 }) {
   const card = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
+  const sourceOheng = slots.map((s) => s.sourceOheng).filter(Boolean) as Oheng[];
 
   return (
     <motion.div
@@ -46,10 +49,16 @@ export default function AnalysisPanels({
     >
       <motion.div variants={card} className="ap-card p-5 sm:p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-neutral-900">음양 · 원획 획수</h3>
+          <h3 className="text-sm font-semibold text-neutral-900">음양 · 획수 균형</h3>
           <Badge status={yinYangGilHeung} />
         </div>
-        <div className="mb-2 flex flex-wrap gap-2">
+
+        <EasyTip>
+          한자 획수가 <strong>홀수=양(陽)</strong>, <strong>짝수=음(陰)</strong>입니다. 양과 음이
+          고르게 섞이면 균형 잡힌 이름입니다.
+        </EasyTip>
+
+        <div className="mb-2 mt-4 flex flex-wrap gap-2">
           {slots.map((s, i) => (
             <div
               key={`${s.char}-${i}`}
@@ -68,16 +77,37 @@ export default function AnalysisPanels({
             </div>
           ))}
         </div>
-        <YinYangBalance pattern={yinYangPattern} />
+
+        <div className="mt-4">
+          <YinYangChart pattern={yinYangPattern} />
+        </div>
         <p className="mt-4 text-sm leading-relaxed text-neutral-600">{yinYangSummary}</p>
       </motion.div>
 
       <motion.div variants={card} className="ap-card p-5 sm:p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-neutral-900">발음오행</h3>
+          <h3 className="text-sm font-semibold text-neutral-900">발음오행 · 소리의 기운</h3>
           <Badge status={pronunciationGilHeung} />
         </div>
+
+        <EasyTip>
+          이름을 <strong>소리 내어 읽을 때</strong>의 초성(ㄱ·ㄴ·ㄷ…)에 따라 목·화·토·금·수 기운이
+          붙습니다. 소리끼리 상생하면 좋습니다.
+        </EasyTip>
+
         <OhengFlowChart items={pronunciation} flow={pronunciationFlow} />
+
+        <div className="mt-4">
+          <OhengCycleChart highlight={[...pronunciationFlow, ...sourceOheng]} />
+        </div>
+
+        <dl className="info-glossary mt-4">
+          <div>
+            <dt>상생 · 상극</dt>
+            <dd>상생 = 서로 돕는 관계(좋음). 상극 = 서로 겹치는 관계(주의).</dd>
+          </div>
+        </dl>
+
         <p className="mt-4 text-sm leading-relaxed text-neutral-600">{pronunciationSummary}</p>
       </motion.div>
     </motion.div>

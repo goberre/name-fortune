@@ -241,3 +241,50 @@ body {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* ── 인포그래픽 ── */
+.info-chart {
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+  padding: 1rem 1.25rem;
+}
+
+.info-tip {
+  border-radius: 0.875rem;
+  border-left: 3px solid #171717;
+  background: #fafafa;
+  padding: 0.875rem 1rem;
+}
+
+.info-tip-title {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+.info-tip-body {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: #525252;
+}
+
+.info-glossary {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.info-glossary dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #171717;
+}
+
+.info-glossary dd {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #737373;
+}

@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AnalysisPanels from "@/components/seongmyung/AnalysisPanels";
+import ResultGuidePanel from "@/components/infographics/ResultGuidePanel";
 import BirthRegionPanel from "@/components/seongmyung/BirthRegionPanel";
 import HanjaPicker from "@/components/seongmyung/HanjaPicker";
 import OhengHarmonyPanel from "@/components/seongmyung/OhengHarmonyPanel";
@@ -301,6 +302,10 @@ export default function SeongmyungApp() {
             transition={slide.transition}
           >
             <motion.div initial="hidden" animate="show" variants={stagger} className="space-y-6">
+              <motion.div variants={fadeUp}>
+                <ResultGuidePanel />
+              </motion.div>
+
               <motion.div variants={fadeUp} className="ap-card p-8 text-center sm:p-10">
                 <p className="text-sm font-medium text-neutral-500">성명학 분석 결과</p>
                 <p className="mt-3 text-4xl font-semibold tracking-tight text-neutral-900">{result.name}</p>

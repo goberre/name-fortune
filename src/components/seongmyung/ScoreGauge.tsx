@@ -51,7 +51,12 @@ export default function ScoreGauge({ score, grade }: { score: number; grade: str
         </div>
       </div>
       <p className="mt-4 text-base font-semibold text-neutral-900">{grade}</p>
-      <p className="text-xs text-neutral-500">종합 성명학 점수</p>
+      <div className="mt-2 flex flex-wrap justify-center gap-2 text-[10px] text-neutral-400">
+        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">85+ 대길</span>
+        <span className="rounded-full bg-neutral-100 px-2 py-0.5">70+ 길</span>
+        <span className="rounded-full bg-neutral-100 px-2 py-0.5">55+ 보통</span>
+      </div>
+      <p className="mt-2 text-xs text-neutral-500">종합 성명학 점수</p>
     </motion.div>
   );
 }
