@@ -1,9 +1,12 @@
 /** Full-screen horror-mystic atmosphere */
+import FolklorePassers from "@/components/FolklorePassers";
+
 export default function MysticAmbience() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
       <div className="myst-void" />
       <div className="myst-blood-moon" />
+      <FolklorePassers />
       <div className="myst-vignette" />
       <div className="myst-vignette-deep" />
       <div className="myst-fog myst-fog-1" />

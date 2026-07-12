@@ -161,6 +161,182 @@ body {
   opacity: 0.5;
 }
 
+/* ── 도깨비불 · 도깨비 · 백호 ── */
+.folklore-layer {
+  z-index: 1;
+}
+
+.dok-fire {
+  position: absolute;
+  animation: dok-fire-drift ease-in-out infinite;
+}
+
+.dok-fire-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(
+    ellipse at 50% 70%,
+    #ecfccb 0%,
+    #4ade80 25%,
+    #22d3ee 55%,
+    rgba(34, 211, 238, 0) 75%
+  );
+  box-shadow:
+    0 0 12px rgba(74, 222, 128, 0.9),
+    0 0 28px rgba(34, 211, 238, 0.5),
+    0 0 48px rgba(74, 222, 128, 0.25);
+  animation: dok-fire-flicker 0.35s ease-in-out infinite alternate;
+}
+
+.dok-fire-tail {
+  position: absolute;
+  bottom: -30%;
+  left: 20%;
+  width: 60%;
+  height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(34, 211, 238, 0.35) 0%, transparent 70%);
+  filter: blur(3px);
+  animation: dok-fire-flicker 0.5s ease-in-out infinite alternate-reverse;
+}
+
+.dok-spirit {
+  position: absolute;
+  bottom: 22%;
+  filter: blur(0.5px);
+}
+
+.dok-spirit-1 {
+  animation: dok-pass-1 28s linear infinite;
+}
+
+.dok-spirit-2 {
+  bottom: 38%;
+  animation: dok-pass-2 36s linear infinite;
+  animation-delay: -14s;
+}
+
+.baekho-spirit {
+  position: absolute;
+  top: 58%;
+  left: -30%;
+  filter: blur(1px);
+  animation: baekho-prowl 45s ease-in-out infinite;
+}
+
+.mountain-mist {
+  position: absolute;
+  width: 140%;
+  height: 25%;
+  filter: blur(40px);
+  opacity: 0.35;
+}
+
+.mountain-mist-1 {
+  bottom: 8%;
+  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.12), rgba(74, 222, 128, 0.06), transparent);
+  animation: myst-drift 40s ease-in-out infinite;
+}
+
+.mountain-mist-2 {
+  bottom: 18%;
+  background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.08), transparent);
+  animation: myst-drift 50s ease-in-out infinite reverse;
+  opacity: 0.25;
+}
+
+@keyframes dok-fire-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(8px, -14px) scale(1.08);
+  }
+  50% {
+    transform: translate(-6px, -22px) scale(0.92);
+  }
+  75% {
+    transform: translate(10px, -10px) scale(1.05);
+  }
+}
+
+@keyframes dok-fire-flicker {
+  0% {
+    opacity: 0.85;
+    transform: scale(1) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.06) rotate(2deg);
+  }
+}
+
+@keyframes dok-pass-1 {
+  0% {
+    transform: translateX(-120px) translateY(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.18;
+  }
+  45% {
+    opacity: 0.14;
+  }
+  50% {
+    transform: translateX(calc(100vw + 120px)) translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(calc(100vw + 120px)) translateY(-20px);
+    opacity: 0;
+  }
+}
+
+@keyframes dok-pass-2 {
+  0% {
+    transform: translateX(calc(100vw + 100px)) scaleX(-1) translateY(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.12;
+  }
+  45% {
+    opacity: 0.1;
+  }
+  50% {
+    transform: translateX(-120px) scaleX(-1) translateY(15px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-120px) scaleX(-1) translateY(15px);
+    opacity: 0;
+  }
+}
+
+@keyframes baekho-prowl {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.1;
+  }
+  40% {
+    opacity: 0.08;
+    transform: translateX(55vw) translateY(-8px);
+  }
+  48% {
+    opacity: 0;
+    transform: translateX(70vw) translateY(-5px);
+  }
+  100% {
+    transform: translateX(70vw) translateY(-5px);
+    opacity: 0;
+  }
+}
+
 /* ── Ritual ring ── */
 .ritual-ring-wrap {
   opacity: 0.55;
@@ -597,5 +773,12 @@ body {
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .dok-fire,
+  .dok-spirit,
+  .baekho-spirit,
+  .mountain-mist {
+    opacity: 0.15 !important;
   }
 }
