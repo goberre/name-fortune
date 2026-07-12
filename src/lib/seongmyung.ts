@@ -1,4 +1,5 @@
 /** 발음오행 — 초성(자음) 기준 분류 */
+import type { BirthProfile } from "@/types/birth";
 import type { SajuOhengProfile, SourceOhengHarmony } from "@/lib/saju";
 import { analyzeSajuOheng, analyzeSourceOhengHarmony } from "@/lib/saju";
 
@@ -45,7 +46,8 @@ export type SeongmyungResult = {
   pronunciationGilHeung: GilHeung;
   pronunciationSummary: string;
   sagyeok: SagyeokGrid[];
-  birthDate?: { year: number; month: number; day: number };
+  birthDate?: BirthProfile;
+  gender?: BirthProfile["gender"];
   sajuProfile?: SajuOhengProfile;
   sourceOheng?: Oheng[];
   sourceOhengHarmony?: SourceOhengHarmony;
@@ -318,15 +320,19 @@ export function computeTotalScore(
   pronunciation: GilHeung,
   sagyeok: SagyeokGrid[],
   sourceHarmony?: GilHeung,
+  sourceMatchScore?: number,
 ): number {
   let score = 0;
-  score += scoreGilHeung(yinYang) * 22;
-  score += scoreGilHeung(pronunciation) * 22;
+  score += scoreGilHeung(yinYang) * 20;
+  score += scoreGilHeung(pronunciation) * 20;
   for (const s of sagyeok) {
-    score += scoreGilHeung(s.gilHeung) * 11;
+    score += scoreGilHeung(s.gilHeung) * 10;
   }
   if (sourceHarmony) {
-    score += scoreGilHeung(sourceHarmony) * 12;
+    score += scoreGilHeung(sourceHarmony) * 10;
+  }
+  if (sourceMatchScore !== undefined) {
+    score += (sourceMatchScore / 100) * 20;
   }
   return Math.round(Math.min(100, Math.max(0, score)));
 }
@@ -354,7 +360,7 @@ export type HanjaSlotInput = {
 export type AnalyzeInput = {
   name: string;
   hanjaSlots: HanjaSlotInput[];
-  birthDate?: { year: number; month: number; day: number };
+  birth?: BirthProfile;
 };
 
 export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
@@ -398,10 +404,10 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
   let birthOheng: Oheng | undefined;
   let birthSummary: string | undefined;
 
-  if (input.birthDate) {
-    sajuProfile = analyzeSajuOheng(input.birthDate);
+  if (input.birth) {
+    sajuProfile = analyzeSajuOheng(input.birth);
     sourceOhengHarmony = analyzeSourceOhengHarmony(sajuProfile, sourceOheng);
-    birthOheng = sajuProfile.yearOheng;
+    birthOheng = sajuProfile.dayOheng;
     birthSummary = sajuProfile.summary;
   }
 
@@ -410,6 +416,7 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
     pronunciation.gilHeung,
     sagyeok,
     sourceOhengHarmony?.gilHeung,
+    sourceOhengHarmony?.matchScore,
   );
 
   return {
@@ -424,7 +431,8 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
     pronunciationGilHeung: pronunciation.gilHeung,
     pronunciationSummary: pronunciation.summary,
     sagyeok,
-    birthDate: input.birthDate,
+    birthDate: input.birth,
+    gender: input.birth?.gender,
     sajuProfile,
     sourceOheng,
     sourceOhengHarmony,

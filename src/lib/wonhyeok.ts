@@ -25,6 +25,8 @@ export const WONHYEOK_RADICALS: RadicalRule[] = [
   { radical: "牜", source: "牛", wonStrokes: 4, okpyeonStrokes: 4 },
   { radical: "犭", source: "犬", wonStrokes: 4, okpyeonStrokes: 3 },
   { radical: "纟", source: "糸", wonStrokes: 6, okpyeonStrokes: 3 },
+  { radical: "⻏", source: "邑", wonStrokes: 7, okpyeonStrokes: 3 },
+  { radical: "⻖", source: "阜", wonStrokes: 8, okpyeonStrokes: 3 },
 ];
 
 /** 인명용 한자 원획법 획수 (옥편과 다른 경우 명시) */
@@ -312,9 +314,22 @@ export const WONHYEOK_OVERRIDES: Record<string, number> = {
 export function getWonhyeokStrokes(hanja: string): number {
   let total = 0;
   for (const ch of hanja) {
-    total += WONHYEOK_OVERRIDES[ch] ?? fallbackStrokes(ch);
+    total += strokeForChar(ch, hanja);
   }
   return total;
+}
+
+function strokeForChar(ch: string, full: string): number {
+  if (WONHYEOK_OVERRIDES[ch]) return WONHYEOK_OVERRIDES[ch];
+  for (const rule of WONHYEOK_RADICALS) {
+    if (full.includes(rule.radical)) {
+      const base = fallbackStrokes(ch);
+      if (ch === rule.radical || full.indexOf(rule.radical) >= 0) {
+        return Math.max(base, rule.wonStrokes + base - rule.okpyeonStrokes);
+      }
+    }
+  }
+  return fallbackStrokes(ch);
 }
 
 function fallbackStrokes(ch: string): number {
@@ -324,6 +339,9 @@ function fallbackStrokes(ch: string): number {
 }
 
 export function getWonhyeokNote(hanja: string): string | null {
+  if (/[⻏⻖]/.test(hanja)) {
+    return "원획법: ⻏→邑(7획), ⻖→阜(8획) 기준 적용";
+  }
   if (/[氵扌艹王]/.test(hanja)) {
     return "원획법: 氵→水(4획), 扌→手(4획), 艹→艸(6획), 王→玉(5획) 기준 적용";
   }

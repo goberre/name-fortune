@@ -7,12 +7,15 @@ import HanjaPicker from "@/components/seongmyung/HanjaPicker";
 import OhengHarmonyPanel from "@/components/seongmyung/OhengHarmonyPanel";
 import SagyeokTimeline from "@/components/seongmyung/SagyeokTimeline";
 import ScoreGauge from "@/components/seongmyung/ScoreGauge";
+import Step1Form, { buildBirthProfile } from "@/components/seongmyung/Step1Form";
 import { getHanjaCandidates, loadHanjaIndex, type HanjaSelection } from "@/lib/hanja";
 import {
   analyzeSeongmyung,
   isValidKoreanName,
   type SeongmyungResult,
 } from "@/lib/seongmyung";
+import type { CalendarType, Gender } from "@/types/birth";
+import { CALENDAR_LABEL, GENDER_LABEL } from "@/types/birth";
 
 function sanitizeName(value: string) {
   return value.replace(/[^가-힣]/g, "").slice(0, 4);
@@ -20,12 +23,25 @@ function sanitizeName(value: string) {
 
 type Step = 1 | 2 | "result";
 
+const slide = {
+  initial: (dir: number) => ({ x: dir > 0 ? 48 : -48, opacity: 0 }),
+  animate: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir > 0 ? -48 : 48, opacity: 0 }),
+  transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
+};
+
 export default function SeongmyungApp() {
   const [step, setStep] = useState<Step>(1);
+  const [direction, setDirection] = useState(1);
   const [name, setName] = useState("");
+  const [gender, setGender] = useState<Gender>("male");
+  const [calendarType, setCalendarType] = useState<CalendarType>("solar");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [birthYear, setBirthYear] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthDay, setBirthDay] = useState("");
+  const [birthHour, setBirthHour] = useState("");
+  const [birthMinute, setBirthMinute] = useState("");
   const [hanjaSelections, setHanjaSelections] = useState<(HanjaSelection | null)[]>([]);
   const [hanjaIndexReady, setHanjaIndexReady] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
@@ -33,6 +49,12 @@ export default function SeongmyungApp() {
   const [error, setError] = useState("");
 
   const chars = useMemo(() => [...name], [name]);
+
+  const goTo = (next: Step, dir: number) => {
+    setDirection(dir);
+    setStep(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleNameChange = useCallback(
     (value: string) => {
@@ -72,7 +94,7 @@ export default function SeongmyungApp() {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- auto-pick first candidate per char
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, hanjaIndexReady, name]);
 
   function handleHanjaSelect(index: number, selection: HanjaSelection) {
@@ -101,8 +123,11 @@ export default function SeongmyungApp() {
       setError("올바른 생년월일을 입력해 주세요.");
       return;
     }
-    setStep(2);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (birthHour !== "" && (Number(birthHour) < 0 || Number(birthHour) > 23)) {
+      setError("출생 시간(시)은 0~23 사이로 입력해 주세요.");
+      return;
+    }
+    goTo(2, 1);
   }
 
   function handleAnalyze() {
@@ -123,27 +148,37 @@ export default function SeongmyungApp() {
             oheng: s.oheng,
             wonStrokes: s.wonStrokes,
           })),
-          birthDate: {
-            year: Number(birthYear),
-            month: Number(birthMonth),
-            day: Number(birthDay),
-          },
+          birth: buildBirthProfile({
+            birthYear,
+            birthMonth,
+            birthDay,
+            birthHour,
+            birthMinute,
+            gender,
+            calendarType,
+            isLeapMonth,
+          }),
         }),
       );
-      setStep("result");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      goTo("result", 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "분석 중 오류가 발생했습니다.");
     }
   }
 
   function reset() {
+    setDirection(-1);
     setStep(1);
     setResult(null);
     setName("");
+    setGender("male");
+    setCalendarType("solar");
+    setIsLeapMonth(false);
     setBirthYear("");
     setBirthMonth("");
     setBirthDay("");
+    setBirthHour("");
+    setBirthMinute("");
     setHanjaSelections([]);
     setError("");
   }
@@ -159,7 +194,11 @@ export default function SeongmyungApp() {
             <div key={s} className="flex items-center gap-3">
               <span
                 className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
-                  step === s ? "bg-neutral-900 text-white" : step > s ? "bg-neutral-200 text-neutral-600" : "bg-neutral-100 text-neutral-400"
+                  step === s
+                    ? "bg-neutral-900 text-white"
+                    : step > s
+                      ? "bg-neutral-200 text-neutral-600"
+                      : "bg-neutral-100 text-neutral-400"
                 }`}
               >
                 {s}
@@ -173,96 +212,62 @@ export default function SeongmyungApp() {
         </div>
       )}
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" custom={direction}>
         {step === 1 && (
-          <motion.form
+          <motion.div
             key="step1"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            onSubmit={goStep2}
-            className="ap-card space-y-8 p-6 sm:p-10"
+            custom={direction}
+            variants={slide}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={slide.transition}
           >
-            <div>
-              <label htmlFor="name" className="ap-label">
-                한글 이름
-              </label>
-              <input
-                id="name"
-                value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                onCompositionStart={() => setIsComposing(true)}
-                onCompositionEnd={(e) => {
-                  setIsComposing(false);
-                  handleNameChange(sanitizeName(e.currentTarget.value));
-                }}
-                placeholder="홍길동"
-                maxLength={4}
-                lang="ko"
-                className="ap-input mt-3 px-5 py-5 text-center text-3xl font-semibold tracking-[0.15em]"
-              />
-              <p className="mt-2 text-center text-xs text-neutral-400">2~4글자 · 성+이름</p>
-            </div>
-
-            <div>
-              <p className="ap-label">생년월일</p>
-              <div className="mt-3 grid grid-cols-3 gap-3">
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  placeholder="1990"
-                  min={1900}
-                  max={2100}
-                  value={birthYear}
-                  onChange={(e) => setBirthYear(e.target.value.slice(0, 4))}
-                  className="ap-input px-4 py-3.5 text-center text-lg"
-                  aria-label="출생년"
-                />
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  placeholder="01"
-                  min={1}
-                  max={12}
-                  value={birthMonth}
-                  onChange={(e) => setBirthMonth(e.target.value.slice(0, 2))}
-                  className="ap-input px-4 py-3.5 text-center text-lg"
-                  aria-label="출생월"
-                />
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  placeholder="01"
-                  min={1}
-                  max={31}
-                  value={birthDay}
-                  onChange={(e) => setBirthDay(e.target.value.slice(0, 2))}
-                  className="ap-input px-4 py-3.5 text-center text-lg"
-                  aria-label="출생일"
-                />
-              </div>
-              <p className="mt-2 text-xs text-neutral-400">사주 자원오행 분석에 사용됩니다</p>
-            </div>
-
-            {error && <p className="text-center text-sm text-rose-600">{error}</p>}
-
-            <button type="submit" disabled={name.length < 2} className="ap-btn">
-              다음 — 한자 선택
-            </button>
-          </motion.form>
+            <Step1Form
+              name={name}
+              gender={gender}
+              calendarType={calendarType}
+              isLeapMonth={isLeapMonth}
+              birthYear={birthYear}
+              birthMonth={birthMonth}
+              birthDay={birthDay}
+              birthHour={birthHour}
+              birthMinute={birthMinute}
+              isComposing={isComposing}
+              error={error}
+              onNameChange={handleNameChange}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={(v) => {
+                setIsComposing(false);
+                handleNameChange(sanitizeName(v));
+              }}
+              setGender={setGender}
+              setCalendarType={setCalendarType}
+              setIsLeapMonth={setIsLeapMonth}
+              setBirthYear={setBirthYear}
+              setBirthMonth={setBirthMonth}
+              setBirthDay={setBirthDay}
+              setBirthHour={setBirthHour}
+              setBirthMinute={setBirthMinute}
+              onSubmit={goStep2}
+            />
+          </motion.div>
         )}
 
         {step === 2 && (
           <motion.div
             key="step2"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+            custom={direction}
+            variants={slide}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={slide.transition}
             className="space-y-5"
           >
             <div className="text-center">
-              <p className="text-sm text-neutral-500">「{name}」의 한자를 선택하세요</p>
-              <p className="mt-1 text-xs text-neutral-400">원획법 획수 · 자원오행이 실시간 반영됩니다</p>
+              <p className="text-sm text-neutral-500">「{name}」의 한자를 선택해 주세요</p>
+              <p className="mt-1 text-xs text-neutral-400">대법원 인명용 한자 · 원획법 · 자원오행</p>
             </div>
 
             {chars.map((ch, i) => (
@@ -278,7 +283,7 @@ export default function SeongmyungApp() {
             {error && <p className="text-center text-sm text-rose-600">{error}</p>}
 
             <div className="flex gap-3">
-              <button type="button" onClick={() => setStep(1)} className="ap-btn-secondary flex-1">
+              <button type="button" onClick={() => goTo(1, -1)} className="ap-btn-secondary flex-1">
                 이전
               </button>
               <button type="button" onClick={handleAnalyze} className="ap-btn flex-[2]">
@@ -291,54 +296,66 @@ export default function SeongmyungApp() {
         {step === "result" && result && (
           <motion.div
             key="result"
-            initial="hidden"
-            animate="show"
-            variants={stagger}
-            className="space-y-6"
+            custom={direction}
+            variants={slide}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={slide.transition}
           >
-            <motion.div variants={fadeUp} className="ap-card p-8 text-center sm:p-10">
-              <p className="text-sm font-medium text-neutral-500">성명학 분석 결과</p>
-              <p className="mt-3 text-4xl font-semibold tracking-tight text-neutral-900">{result.name}</p>
-              <p className="mt-1 font-serif text-2xl text-neutral-600">{result.hanjaDisplay}</p>
-              <div className="mt-8 flex justify-center">
-                <ScoreGauge score={result.totalScore} grade={result.gradeLabel} />
-              </div>
-            </motion.div>
+            <motion.div initial="hidden" animate="show" variants={stagger} className="space-y-6">
+              <motion.div variants={fadeUp} className="ap-card p-8 text-center sm:p-10">
+                <p className="text-sm font-medium text-neutral-500">성명학 분석 결과</p>
+                <p className="mt-3 text-4xl font-semibold tracking-tight text-neutral-900">{result.name}</p>
+                <p className="mt-1 font-serif text-2xl text-neutral-600">{result.hanjaDisplay}</p>
+                {result.birthDate && (
+                  <p className="mt-2 text-xs text-neutral-400">
+                    {GENDER_LABEL[result.birthDate.gender]} · {CALENDAR_LABEL[result.birthDate.calendarType]}
+                    {result.birthDate.isLeapMonth ? " 윤달" : ""} · {result.birthDate.year}.{result.birthDate.month}.
+                    {result.birthDate.day}
+                    {result.birthDate.hour !== undefined ? ` ${result.birthDate.hour}시` : ""}
+                  </p>
+                )}
+                <div className="mt-8 flex justify-center">
+                  <ScoreGauge score={result.totalScore} grade={result.gradeLabel} />
+                </div>
+              </motion.div>
 
-            {result.sajuProfile && result.sourceOhengHarmony && result.sourceOheng && (
+              {result.sajuProfile && result.sourceOhengHarmony && result.sourceOheng && (
+                <motion.div variants={fadeUp}>
+                  <OhengHarmonyPanel
+                    saju={result.sajuProfile}
+                    nameOheng={result.sourceOheng}
+                    harmony={result.sourceOhengHarmony}
+                  />
+                </motion.div>
+              )}
+
               <motion.div variants={fadeUp}>
-                <OhengHarmonyPanel
-                  saju={result.sajuProfile}
-                  nameOheng={result.sourceOheng}
-                  harmony={result.sourceOhengHarmony}
+                <AnalysisPanels
+                  slots={result.slots}
+                  yinYangPattern={result.yinYangPattern}
+                  yinYangGilHeung={result.yinYangGilHeung}
+                  yinYangSummary={result.yinYangSummary}
+                  pronunciation={result.pronunciation}
+                  pronunciationFlow={result.pronunciationFlow}
+                  pronunciationGilHeung={result.pronunciationGilHeung}
+                  pronunciationSummary={result.pronunciationSummary}
                 />
               </motion.div>
-            )}
 
-            <motion.div variants={fadeUp}>
-              <AnalysisPanels
-                slots={result.slots}
-                yinYangPattern={result.yinYangPattern}
-                yinYangGilHeung={result.yinYangGilHeung}
-                yinYangSummary={result.yinYangSummary}
-                pronunciation={result.pronunciation}
-                pronunciationFlow={result.pronunciationFlow}
-                pronunciationGilHeung={result.pronunciationGilHeung}
-                pronunciationSummary={result.pronunciationSummary}
-              />
-            </motion.div>
+              <motion.div variants={fadeUp}>
+                <SagyeokTimeline grids={result.sagyeok} />
+              </motion.div>
 
-            <motion.div variants={fadeUp}>
-              <SagyeokTimeline grids={result.sagyeok} />
-            </motion.div>
-
-            <motion.div variants={fadeUp}>
-              <button type="button" onClick={reset} className="ap-btn-secondary w-full">
-                다른 이름 풀기
-              </button>
-              <p className="mt-4 text-center text-xs text-neutral-400">
-                전통 성명학 · 원획법 · 81수리 기반 참고용 풀이입니다.
-              </p>
+              <motion.div variants={fadeUp}>
+                <button type="button" onClick={reset} className="ap-btn-secondary w-full">
+                  다른 이름 풀기
+                </button>
+                <p className="mt-4 text-center text-xs text-neutral-400">
+                  전통 성명학 · 원획법 · 81수리 기반 참고용 풀이입니다.
+                </p>
+              </motion.div>
             </motion.div>
           </motion.div>
         )}

@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
+import OhengFlowChart from "@/components/seongmyung/OhengFlowChart";
 import { OhengBadge } from "@/components/seongmyung/HanjaPicker";
+import YinYangBalance from "@/components/seongmyung/YinYangBalance";
 import type { GilHeung, Oheng, PronunciationOheng, StrokeSlot, YinYang } from "@/lib/seongmyung";
 
 function Badge({ status }: { status: GilHeung }) {
@@ -19,6 +21,7 @@ export default function AnalysisPanels({
   yinYangPattern,
   yinYangGilHeung,
   yinYangSummary,
+  pronunciation,
   pronunciationFlow,
   pronunciationGilHeung,
   pronunciationSummary,
@@ -46,7 +49,7 @@ export default function AnalysisPanels({
           <h3 className="text-sm font-semibold text-neutral-900">음양 · 원획 획수</h3>
           <Badge status={yinYangGilHeung} />
         </div>
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-2 flex flex-wrap gap-2">
           {slots.map((s, i) => (
             <div
               key={`${s.char}-${i}`}
@@ -65,7 +68,8 @@ export default function AnalysisPanels({
             </div>
           ))}
         </div>
-        <p className="text-sm leading-relaxed text-neutral-600">{yinYangSummary}</p>
+        <YinYangBalance pattern={yinYangPattern} />
+        <p className="mt-4 text-sm leading-relaxed text-neutral-600">{yinYangSummary}</p>
       </motion.div>
 
       <motion.div variants={card} className="ap-card p-5 sm:p-6">
@@ -73,15 +77,8 @@ export default function AnalysisPanels({
           <h3 className="text-sm font-semibold text-neutral-900">발음오행</h3>
           <Badge status={pronunciationGilHeung} />
         </div>
-        <div className="mb-4 flex flex-wrap items-center gap-1.5">
-          {pronunciationFlow.map((o, i) => (
-            <span key={i} className="flex items-center gap-1.5">
-              {i > 0 && <span className="text-neutral-300">→</span>}
-              <OhengBadge oheng={o} />
-            </span>
-          ))}
-        </div>
-        <p className="text-sm leading-relaxed text-neutral-600">{pronunciationSummary}</p>
+        <OhengFlowChart items={pronunciation} flow={pronunciationFlow} />
+        <p className="mt-4 text-sm leading-relaxed text-neutral-600">{pronunciationSummary}</p>
       </motion.div>
     </motion.div>
   );

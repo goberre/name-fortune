@@ -32,11 +32,26 @@ export default function OhengHarmonyPanel({
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-neutral-900">자원오행 · 사주 조화</h3>
-          <p className="mt-1 text-sm text-neutral-500">한자의 기운이 사주와 어떻게 맞는지</p>
+          <p className="mt-1 text-sm text-neutral-500">한자 기운이 사주를 보완하는지 분석</p>
         </div>
         <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${statusColor}`}>
           {harmony.gilHeung}
         </span>
+      </div>
+
+      <div className="mb-5">
+        <div className="mb-2 flex justify-between text-xs text-neutral-500">
+          <span>사주 매칭 점수</span>
+          <span className="font-semibold text-neutral-900">{harmony.matchScore}점</span>
+        </div>
+        <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100">
+          <motion.div
+            className="h-full rounded-full bg-neutral-900"
+            initial={{ width: 0 }}
+            animate={{ width: `${harmony.matchScore}%` }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          />
+        </div>
       </div>
 
       <div className="mb-5 grid gap-4 sm:grid-cols-2">
@@ -46,6 +61,7 @@ export default function OhengHarmonyPanel({
             <OhengBadge oheng={saju.yearOheng} />
             <OhengBadge oheng={saju.monthOheng} />
             <OhengBadge oheng={saju.dayOheng} />
+            {saju.hourOheng && <OhengBadge oheng={saju.hourOheng} />}
           </div>
         </div>
         <div>
@@ -58,17 +74,29 @@ export default function OhengHarmonyPanel({
         </div>
       </div>
 
-      {harmony.fillsLacking.length > 0 && (
+      {(harmony.fillsLacking.length > 0 || harmony.matchesUseful.length > 0) && (
         <div className="mb-4 flex flex-wrap gap-2">
           {harmony.fillsLacking.map((o) => (
             <span
-              key={o}
+              key={`fill-${o}`}
               className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200"
             >
-              {o} 기운 보완 ✓
+              {o}행 보완
+            </span>
+          ))}
+          {harmony.matchesUseful.map((o) => (
+            <span
+              key={`use-${o}`}
+              className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-200"
+            >
+              희신 {o}행
             </span>
           ))}
         </div>
+      )}
+
+      {saju.calendarNote && (
+        <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">{saju.calendarNote}</p>
       )}
 
       <p className="text-sm leading-relaxed text-neutral-600">{harmony.summary}</p>
