@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+body {
+  font-family:
+    "Pretendard Variable",
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+.mesh-name {
+  background-color: #0a0612;
+  background-image:
+    radial-gradient(at 20% 10%, rgba(139, 92, 246, 0.35) 0, transparent 50%),
+    radial-gradient(at 80% 20%, rgba(99, 102, 241, 0.25) 0, transparent 45%),
+    radial-gradient(at 50% 90%, rgba(167, 139, 250, 0.15) 0, transparent 50%);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
