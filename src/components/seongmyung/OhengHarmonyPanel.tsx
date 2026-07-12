@@ -61,7 +61,12 @@ export default function OhengHarmonyPanel({
             <OhengBadge oheng={saju.yearOheng} />
             <OhengBadge oheng={saju.monthOheng} />
             <OhengBadge oheng={saju.dayOheng} />
-            {saju.hourOheng && <OhengBadge oheng={saju.hourOheng} />}
+            {saju.regionOheng && (
+              <span className="inline-flex items-center gap-1">
+                <OhengBadge oheng={saju.regionOheng} />
+                <span className="text-xs text-neutral-400">{saju.regionLabel ?? "태생지"}</span>
+              </span>
+            )}
           </div>
         </div>
         <div>

@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AnalysisPanels from "@/components/seongmyung/AnalysisPanels";
+import BirthRegionPanel from "@/components/seongmyung/BirthRegionPanel";
 import HanjaPicker from "@/components/seongmyung/HanjaPicker";
 import OhengHarmonyPanel from "@/components/seongmyung/OhengHarmonyPanel";
 import SagyeokTimeline from "@/components/seongmyung/SagyeokTimeline";
@@ -15,6 +16,7 @@ import {
   type SeongmyungResult,
 } from "@/lib/seongmyung";
 import type { CalendarType, Gender } from "@/types/birth";
+import { getBirthRegion } from "@/lib/birth-region";
 import { CALENDAR_LABEL, GENDER_LABEL } from "@/types/birth";
 
 function sanitizeName(value: string) {
@@ -40,8 +42,7 @@ export default function SeongmyungApp() {
   const [birthYear, setBirthYear] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthDay, setBirthDay] = useState("");
-  const [birthHour, setBirthHour] = useState("");
-  const [birthMinute, setBirthMinute] = useState("");
+  const [birthRegion, setBirthRegion] = useState("");
   const [hanjaSelections, setHanjaSelections] = useState<(HanjaSelection | null)[]>([]);
   const [hanjaIndexReady, setHanjaIndexReady] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
@@ -123,8 +124,8 @@ export default function SeongmyungApp() {
       setError("올바른 생년월일을 입력해 주세요.");
       return;
     }
-    if (birthHour !== "" && (Number(birthHour) < 0 || Number(birthHour) > 23)) {
-      setError("출생 시간(시)은 0~23 사이로 입력해 주세요.");
+    if (!birthRegion) {
+      setError("태어난 지역을 선택해 주세요.");
       return;
     }
     goTo(2, 1);
@@ -152,8 +153,7 @@ export default function SeongmyungApp() {
             birthYear,
             birthMonth,
             birthDay,
-            birthHour,
-            birthMinute,
+            birthRegion,
             gender,
             calendarType,
             isLeapMonth,
@@ -177,8 +177,7 @@ export default function SeongmyungApp() {
     setBirthYear("");
     setBirthMonth("");
     setBirthDay("");
-    setBirthHour("");
-    setBirthMinute("");
+    setBirthRegion("");
     setHanjaSelections([]);
     setError("");
   }
@@ -231,8 +230,7 @@ export default function SeongmyungApp() {
               birthYear={birthYear}
               birthMonth={birthMonth}
               birthDay={birthDay}
-              birthHour={birthHour}
-              birthMinute={birthMinute}
+              birthRegion={birthRegion}
               isComposing={isComposing}
               error={error}
               onNameChange={handleNameChange}
@@ -247,8 +245,7 @@ export default function SeongmyungApp() {
               setBirthYear={setBirthYear}
               setBirthMonth={setBirthMonth}
               setBirthDay={setBirthDay}
-              setBirthHour={setBirthHour}
-              setBirthMinute={setBirthMinute}
+              setBirthRegion={setBirthRegion}
               onSubmit={goStep2}
             />
           </motion.div>
@@ -313,13 +310,21 @@ export default function SeongmyungApp() {
                     {GENDER_LABEL[result.birthDate.gender]} · {CALENDAR_LABEL[result.birthDate.calendarType]}
                     {result.birthDate.isLeapMonth ? " 윤달" : ""} · {result.birthDate.year}.{result.birthDate.month}.
                     {result.birthDate.day}
-                    {result.birthDate.hour !== undefined ? ` ${result.birthDate.hour}시` : ""}
+                    {getBirthRegion(result.birthDate.birthRegion)
+                      ? ` · ${getBirthRegion(result.birthDate.birthRegion)!.label} 출생`
+                      : ""}
                   </p>
                 )}
                 <div className="mt-8 flex justify-center">
                   <ScoreGauge score={result.totalScore} grade={result.gradeLabel} />
                 </div>
               </motion.div>
+
+              {result.birthRegionAnalysis && (
+                <motion.div variants={fadeUp}>
+                  <BirthRegionPanel analysis={result.birthRegionAnalysis} />
+                </motion.div>
+              )}
 
               {result.sajuProfile && result.sourceOhengHarmony && result.sourceOheng && (
                 <motion.div variants={fadeUp}>

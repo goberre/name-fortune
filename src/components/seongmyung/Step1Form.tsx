@@ -1,6 +1,7 @@
 "use client";
 
-import type { BirthProfile, CalendarType, Gender } from "@/types/birth";
+import type { CalendarType, Gender } from "@/types/birth";
+import { BIRTH_REGIONS } from "@/lib/birth-region";
 
 type Props = {
   name: string;
@@ -10,8 +11,7 @@ type Props = {
   birthYear: string;
   birthMonth: string;
   birthDay: string;
-  birthHour: string;
-  birthMinute: string;
+  birthRegion: string;
   isComposing: boolean;
   error: string;
   onNameChange: (v: string) => void;
@@ -23,8 +23,7 @@ type Props = {
   setBirthYear: (v: string) => void;
   setBirthMonth: (v: string) => void;
   setBirthDay: (v: string) => void;
-  setBirthHour: (v: string) => void;
-  setBirthMinute: (v: string) => void;
+  setBirthRegion: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 };
 
@@ -147,32 +146,25 @@ export default function Step1Form(props: Props) {
       </div>
 
       <div>
-        <p className="ap-label mb-3">태어난 시간 (선택)</p>
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="14"
-            min={0}
-            max={23}
-            value={props.birthHour}
-            onChange={(e) => props.setBirthHour(e.target.value.slice(0, 2))}
-            className="ap-input px-4 py-3.5 text-center text-lg"
-            aria-label="출생 시"
-          />
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="30"
-            min={0}
-            max={59}
-            value={props.birthMinute}
-            onChange={(e) => props.setBirthMinute(e.target.value.slice(0, 2))}
-            className="ap-input px-4 py-3.5 text-center text-lg"
-            aria-label="출생 분"
-          />
-        </div>
-        <p className="mt-2 text-xs text-neutral-400">시주(時柱) 오행 분석에 반영됩니다</p>
+        <label htmlFor="birthRegion" className="ap-label">
+          태어난 지역
+        </label>
+        <select
+          id="birthRegion"
+          value={props.birthRegion}
+          onChange={(e) => props.setBirthRegion(e.target.value)}
+          className="ap-input mt-3 w-full px-4 py-3.5 text-base"
+        >
+          <option value="">지역을 선택해 주세요</option>
+          {BIRTH_REGIONS.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.label}
+            </option>
+          ))}
+        </select>
+        <p className="mt-2 text-xs text-neutral-400">
+          태생지의 방위·지형 기운(지기)이 사주와 이름 풀이에 반영됩니다
+        </p>
       </div>
 
       {props.error && <p className="text-center text-sm text-rose-600">{props.error}</p>}
@@ -188,21 +180,18 @@ export function buildBirthProfile(p: {
   birthYear: string;
   birthMonth: string;
   birthDay: string;
-  birthHour: string;
-  birthMinute: string;
+  birthRegion: string;
   gender: Gender;
   calendarType: CalendarType;
   isLeapMonth: boolean;
-}): BirthProfile {
-  const profile: BirthProfile = {
+}) {
+  return {
     year: Number(p.birthYear),
     month: Number(p.birthMonth),
     day: Number(p.birthDay),
+    birthRegion: p.birthRegion,
     gender: p.gender,
     calendarType: p.calendarType,
     isLeapMonth: p.isLeapMonth,
   };
-  if (p.birthHour !== "") profile.hour = Number(p.birthHour);
-  if (p.birthMinute !== "") profile.minute = Number(p.birthMinute);
-  return profile;
 }

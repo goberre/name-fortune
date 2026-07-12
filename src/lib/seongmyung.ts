@@ -2,6 +2,7 @@
 import type { BirthProfile } from "@/types/birth";
 import type { SajuOhengProfile, SourceOhengHarmony } from "@/lib/saju";
 import { analyzeSajuOheng, analyzeSourceOhengHarmony } from "@/lib/saju";
+import { analyzeBirthRegionHarmony, type BirthRegionAnalysis } from "@/lib/birth-region";
 
 export type Oheng = "목" | "화" | "토" | "금" | "수";
 export type YinYang = "양" | "음";
@@ -57,6 +58,7 @@ export type SeongmyungResult = {
   sajuProfile?: SajuOhengProfile;
   sourceOheng?: Oheng[];
   sourceOhengHarmony?: SourceOhengHarmony;
+  birthRegionAnalysis?: BirthRegionAnalysis;
   birthOheng?: Oheng;
   birthSummary?: string;
   totalScore: number;
@@ -386,6 +388,8 @@ export function computeTotalScore(
   sagyeok: SagyeokGrid[],
   sourceHarmony?: GilHeung,
   sourceMatchScore?: number,
+  regionHarmony?: GilHeung,
+  regionMatchScore?: number,
 ): number {
   let score = 0;
   score += scoreGilHeung(yinYang) * 20;
@@ -397,7 +401,13 @@ export function computeTotalScore(
     score += scoreGilHeung(sourceHarmony) * 10;
   }
   if (sourceMatchScore !== undefined) {
-    score += (sourceMatchScore / 100) * 20;
+    score += (sourceMatchScore / 100) * 15;
+  }
+  if (regionHarmony) {
+    score += scoreGilHeung(regionHarmony) * 5;
+  }
+  if (regionMatchScore !== undefined) {
+    score += (regionMatchScore / 100) * 10;
   }
   return Math.round(Math.min(100, Math.max(0, score)));
 }
@@ -466,12 +476,14 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
 
   let sajuProfile: SajuOhengProfile | undefined;
   let sourceOhengHarmony: SourceOhengHarmony | undefined;
+  let birthRegionAnalysis: BirthRegionAnalysis | undefined;
   let birthOheng: Oheng | undefined;
   let birthSummary: string | undefined;
 
   if (input.birth) {
     sajuProfile = analyzeSajuOheng(input.birth);
     sourceOhengHarmony = analyzeSourceOhengHarmony(sajuProfile, sourceOheng);
+    birthRegionAnalysis = analyzeBirthRegionHarmony(input.birth.birthRegion, sajuProfile, sourceOheng);
     birthOheng = sajuProfile.dayOheng;
     birthSummary = sajuProfile.summary;
   }
@@ -482,6 +494,8 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
     sagyeok,
     sourceOhengHarmony?.gilHeung,
     sourceOhengHarmony?.matchScore,
+    birthRegionAnalysis?.gilHeung,
+    birthRegionAnalysis?.matchScore,
   );
 
   return {
@@ -501,6 +515,7 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
     sajuProfile,
     sourceOheng,
     sourceOhengHarmony,
+    birthRegionAnalysis,
     birthOheng,
     birthSummary,
     totalScore,
