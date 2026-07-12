@@ -115,12 +115,25 @@ function ResultCard({ result }: { result: NameAnalysis }) {
   );
 }
 
+function sanitizeName(value: string) {
+  return value.replace(/[^가-힣]/g, "").slice(0, 4);
+}
+
 export default function NameFortuneApp() {
   const [name, setName] = useState("");
   const [result, setResult] = useState<NameAnalysis | null>(null);
   const [error, setError] = useState("");
+  const [isComposing, setIsComposing] = useState(false);
 
   const canSubmit = useMemo(() => name.trim().length >= 2, [name]);
+
+  function handleNameChange(value: string) {
+    if (isComposing) {
+      setName(value.slice(0, 4));
+      return;
+    }
+    setName(sanitizeName(value));
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -150,10 +163,21 @@ export default function NameFortuneApp() {
             id="name"
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value.replace(/[^가-힣]/g, ""))}
+            onChange={(e) => handleNameChange(e.target.value)}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={(e) => {
+              setIsComposing(false);
+              setName(sanitizeName(e.currentTarget.value));
+            }}
             placeholder="홍길동"
             maxLength={4}
             autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            lang="ko"
+            inputMode="text"
+            enterKeyHint="go"
             className="mt-4 w-full rounded-2xl border border-violet-400/30 bg-black/30 px-6 py-5 text-center text-3xl font-bold tracking-[0.3em] text-white placeholder:text-white/20 outline-none transition focus:border-violet-400/60 focus:ring-2 focus:ring-violet-500/30"
           />
           <p className="mt-2 text-center text-xs text-white/35">2~4글자 한글 · 성만 또는 이름 전체</p>
