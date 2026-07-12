@@ -2,18 +2,251 @@
 
 body {
   font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Apple SD Gothic Neo",
     "Pretendard Variable",
     Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
     sans-serif;
-  background: #fafafa;
-  color: #171717;
+  background: #09090b;
+  color: #fafafa;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Apple-style minimal ── */
+.font-occult {
+  font-family: "Cormorant Garamond", "Noto Serif KR", Georgia, serif;
+}
+
+/* ═══════════════════════════════════════════
+   Dark Occult Edition
+   ═══════════════════════════════════════════ */
+.oc-body {
+  background: #09090b;
+  color: #fafafa;
+  min-height: 100vh;
+}
+
+.oc-nebula-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: oc-drift 24s ease-in-out infinite alternate;
+}
+.oc-nebula-blob-1 {
+  width: 55vw;
+  height: 55vw;
+  top: -15%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(88, 28, 135, 0.5) 0%, transparent 70%);
+}
+.oc-nebula-blob-2 {
+  width: 45vw;
+  height: 45vw;
+  bottom: -10%;
+  right: -5%;
+  background: radial-gradient(circle, rgba(127, 29, 29, 0.45) 0%, transparent 70%);
+  animation-delay: -8s;
+}
+.oc-nebula-blob-3 {
+  width: 35vw;
+  height: 35vw;
+  top: 40%;
+  left: 30%;
+  background: radial-gradient(circle, rgba(67, 56, 202, 0.25) 0%, transparent 70%);
+  animation-delay: -16s;
+}
+
+.oc-starfield {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.15) 0, transparent 100%),
+    radial-gradient(1px 1px at 60% 70%, rgba(255, 255, 255, 0.1) 0, transparent 100%),
+    radial-gradient(1px 1px at 80% 20%, rgba(255, 255, 255, 0.12) 0, transparent 100%),
+    radial-gradient(1px 1px at 40% 80%, rgba(255, 255, 255, 0.08) 0, transparent 100%);
+  opacity: 0.6;
+}
+
+@keyframes oc-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(3%, 2%) scale(1.05); }
+}
+
+.oc-smoke {
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0, 0, 0, 0.6) 0%, transparent 70%);
+}
+
+.oc-kicker {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(252, 165, 165, 0.55);
+}
+
+.oc-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: rgba(196, 181, 253, 0.75);
+}
+
+.oc-card {
+  border: 1px solid rgba(127, 29, 29, 0.35);
+  background: linear-gradient(165deg, rgba(15, 8, 20, 0.95) 0%, rgba(9, 9, 11, 0.98) 100%);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.oc-card-glow {
+  box-shadow:
+    0 0 60px rgba(127, 29, 29, 0.12),
+    0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.oc-chart {
+  border-radius: 0;
+  border-color: rgba(127, 29, 29, 0.2) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+.oc-input {
+  width: 100%;
+  border-radius: 0;
+  border: 1px solid rgba(127, 29, 29, 0.4);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fecaca;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.oc-input::placeholder { color: rgba(127, 29, 29, 0.5); }
+.oc-input:focus { border-color: rgba(220, 38, 38, 0.55); }
+
+.oc-input-glow:focus {
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.3), 0 0 20px rgba(127, 29, 29, 0.25);
+}
+
+.oc-btn {
+  border-radius: 0;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.oc-btn-primary {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #7f1d1d 0%, #4c1d95 55%, #312e81 100%);
+  color: #fecaca;
+  box-shadow: 0 4px 28px rgba(127, 29, 29, 0.35);
+}
+.oc-btn-primary:hover:not(:disabled) {
+  box-shadow: 0 6px 36px rgba(127, 29, 29, 0.5);
+  transform: translateY(-1px);
+}
+.oc-btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.oc-btn-ghost {
+  border: 1px solid rgba(127, 29, 29, 0.3);
+  background: transparent;
+  color: rgba(252, 165, 165, 0.6);
+  padding: 1rem;
+}
+.oc-btn-ghost:hover { background: rgba(127, 29, 29, 0.15); color: #fecaca; }
+
+.oc-badge {
+  border-radius: 9999px;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.oc-badge-gil { background: rgba(52, 211, 153, 0.12); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.25); }
+
+.oc-tarot-card { cursor: pointer; }
+.oc-tarot-hyung .oc-card {
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 0 30px rgba(127, 29, 29, 0.2);
+}
+
+/* Ritual circle */
+.ritual-ring-wrap { opacity: 0.35; }
+.ritual-ring-active { opacity: 0.65; }
+.ritual-ring-svg { animation: ritual-spin 90s linear infinite; }
+.ritual-outer { stroke: rgba(220, 38, 38, 0.35); }
+.ritual-mid { stroke: rgba(99, 102, 241, 0.25); }
+.ritual-inner { stroke: rgba(220, 38, 38, 0.2); }
+.ritual-node { fill: rgba(220, 38, 38, 0.6); }
+.ritual-rune, .ritual-caption { fill: rgba(252, 165, 165, 0.45); }
+
+@keyframes ritual-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Oracle loader */
+.oracle-loader { min-height: 420px; }
+.oracle-eye {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px rgba(127, 29, 29, 0.3);
+  animation: oracle-pulse 2.5s ease-in-out infinite;
+}
+.oracle-pupil {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fca5a5 0%, #7f1d1d 100%);
+  animation: oracle-look 4s ease-in-out infinite;
+}
+.oracle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: background 0.3s;
+}
+.oracle-dot-on { background: rgba(220, 38, 38, 0.8); box-shadow: 0 0 8px rgba(220, 38, 38, 0.6); }
+
+@keyframes oracle-pulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(127, 29, 29, 0.25); }
+  50% { box-shadow: 0 0 50px rgba(127, 29, 29, 0.45); }
+}
+@keyframes oracle-look {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.85); }
+}
+
+.myst-result-enter { animation: myst-fade 0.8s ease-out; }
+@keyframes myst-fade {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Step indicator */
+.oc-step {
+  display: flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(127, 29, 29, 0.4);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.oc-step-active {
+  background: rgba(127, 29, 29, 0.5);
+  color: #fecaca;
+  box-shadow: 0 0 16px rgba(127, 29, 29, 0.35);
+}
+.oc-step-done { background: rgba(127, 29, 29, 0.2); color: rgba(252, 165, 165, 0.6); }
+.oc-step-idle { color: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.08); }
+
+/* ── Apple-style (legacy fallback) ── */
 .ap-bg {
   background-color: #fafafa;
   background-image: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(0, 0, 0, 0.03) 0, transparent 55%);

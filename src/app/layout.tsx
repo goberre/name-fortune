@@ -8,7 +8,7 @@ import "./globals.css";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#07040f",
+  themeColor: "#09090B",
 };
 
 export const metadata: Metadata = {
@@ -45,8 +45,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="home" href={brandUrls.hub} />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+KR:wght@400;600&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className="min-h-screen bg-[#07040f] text-white antialiased">
+      <body className="oc-body min-h-screen antialiased">
         <JsonLd />
         {children}
       </body>

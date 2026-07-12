@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
+import OhengRune from "@/components/occult/OhengRune";
 import { getHanjaCandidates, isPopularHanja, type HanjaCandidate, type HanjaSelection } from "@/lib/hanja";
 import { type Oheng } from "@/lib/seongmyung";
 
@@ -18,14 +19,17 @@ type Props = {
   index: number;
   selected: HanjaSelection | null;
   onSelect: (index: number, selection: HanjaSelection) => void;
+  variant?: "light" | "occult";
 };
 
-export default function HanjaPicker({ hangul, index, selected, onSelect }: Props) {
+export default function HanjaPicker({ hangul, index, selected, onSelect, variant = "occult" }: Props) {
   const [candidates, setCandidates] = useState<HanjaCandidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(false);
+  const [pulseKey, setPulseKey] = useState<string | null>(null);
+  const occult = variant === "occult";
 
   useEffect(() => {
     let cancelled = false;
@@ -52,29 +56,43 @@ export default function HanjaPicker({ hangul, index, selected, onSelect }: Props
   const filtered = useMemo(() => {
     const q = query.trim();
     if (!q) return candidates;
-    return candidates.filter(
-      (c) => c.hanja.includes(q) || c.meaning.includes(q),
-    );
+    return candidates.filter((c) => c.hanja.includes(q) || c.meaning.includes(q));
   }, [candidates, query]);
 
   const visible = expanded ? filtered : filtered.slice(0, 8);
   const hasMore = filtered.length > 8;
 
+  function pick(c: HanjaCandidate) {
+    setPulseKey(c.hanja);
+    onSelect(index, { hangul, ...c });
+    setTimeout(() => setPulseKey(null), 600);
+  }
+
+  const cardCls = occult ? "oc-card p-5" : "ap-card p-5";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04 }}
-      className="ap-card p-5"
+      transition={{ delay: index * 0.06 }}
+      className={cardCls}
     >
       <div className="mb-4 flex items-center gap-3">
-        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-100 text-xl font-semibold text-neutral-900">
+        <span
+          className={`flex h-12 w-12 items-center justify-center text-xl font-semibold ${
+            occult
+              ? "border border-red-900/50 bg-black/60 font-occult text-red-100"
+              : "rounded-2xl bg-neutral-100 text-neutral-900"
+          }`}
+        >
           {hangul}
         </span>
         <div className="flex-1">
-          <p className="text-sm font-medium text-neutral-900">한자 선택</p>
-          <p className="text-xs text-neutral-500">
-            {loading ? "인명용 한자 불러오는 중…" : `${candidates.length}개 후보 · 인기 한자 우선 · 원획법 · 자원오행`}
+          <p className={`text-sm font-medium ${occult ? "text-red-100" : "text-neutral-900"}`}>
+            {occult ? "영적 주파수 동조" : "한자 선택"}
+          </p>
+          <p className={`text-xs ${occult ? "text-white/35" : "text-neutral-500"}`}>
+            {loading ? "문양 데이터 수신 중…" : `${candidates.length}개 후보 · 인기 한자 우선`}
           </p>
         </div>
       </div>
@@ -84,21 +102,26 @@ export default function HanjaPicker({ hangul, index, selected, onSelect }: Props
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="한자 또는 뜻 검색"
-          className="ap-input mb-3 px-4 py-2.5 text-sm"
+          placeholder="한자 · 뜻 검색"
+          className={occult ? "oc-input mb-3 px-4 py-2.5 text-sm" : "ap-input mb-3 px-4 py-2.5 text-sm"}
         />
       )}
 
       {loading && (
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-14 animate-pulse rounded-xl bg-neutral-100" />
+            <div
+              key={i}
+              className={`h-14 animate-pulse ${occult ? "bg-red-950/30" : "rounded-xl bg-neutral-100"}`}
+            />
           ))}
         </div>
       )}
 
       {error && !loading && (
-        <p className="rounded-xl bg-neutral-50 px-4 py-3 text-sm text-neutral-500">{error}</p>
+        <p className={`px-4 py-3 text-sm ${occult ? "text-red-300/60" : "rounded-xl bg-neutral-50 text-neutral-500"}`}>
+          {error}
+        </p>
       )}
 
       {!loading && !error && (
@@ -107,50 +130,58 @@ export default function HanjaPicker({ hangul, index, selected, onSelect }: Props
             {visible.map((c, vi) => {
               const active = selected?.hanja === c.hanja;
               const popular = vi < 6 && isPopularHanja(hangul, c.hanja);
+              const pulsing = pulseKey === c.hanja;
               return (
-                <button
+                <motion.button
                   key={c.hanja}
                   type="button"
-                  onClick={() => onSelect(index, { hangul, ...c })}
-                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
-                    active
-                      ? "border-neutral-900 bg-neutral-900 text-white shadow-sm"
-                      : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50"
-                  }`}
+                  onClick={() => pick(c)}
+                  animate={pulsing ? { scale: [1, 1.02, 1], boxShadow: ["0 0 0 rgba(220,38,38,0)", "0 0 24px rgba(220,38,38,0.5)", "0 0 0 rgba(220,38,38,0)"] } : {}}
+                  transition={{ duration: 0.5 }}
+                  className={
+                    occult
+                      ? `flex w-full items-center justify-between border px-4 py-3 text-left transition ${
+                          active
+                            ? "border-red-500/60 bg-red-950/50 shadow-[0_0_20px_rgba(127,29,29,0.35)]"
+                            : "border-red-900/25 bg-black/30 hover:border-red-800/50 hover:bg-black/50"
+                        }`
+                      : `flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
+                          active
+                            ? "border-neutral-900 bg-neutral-900 text-white shadow-sm"
+                            : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50"
+                        }`
+                  }
                 >
                   <div className="flex items-center gap-3">
-                    <span className={`text-2xl font-serif ${active ? "text-white" : "text-neutral-900"}`}>
+                    <span
+                      className={`text-2xl font-serif ${active ? (occult ? "text-red-100" : "text-white") : occult ? "text-white" : "text-neutral-900"}`}
+                    >
                       {c.hanja}
                     </span>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className={`text-sm font-medium ${active ? "text-white" : "text-neutral-900"}`}>
+                        <p className={`text-sm font-medium ${active ? (occult ? "text-red-100" : "text-white") : occult ? "text-white/90" : "text-neutral-900"}`}>
                           {c.meaning}
                         </p>
-                        {popular && !active && (
-                          <span className="rounded-full bg-neutral-900 px-1.5 py-0.5 text-[10px] font-semibold text-white">
-                            인기
-                          </span>
-                        )}
-                        {popular && active && (
-                          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                        {popular && (
+                          <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${occult ? "bg-red-800/60 text-red-200" : "bg-neutral-900 text-white"}`}>
                             인기
                           </span>
                         )}
                       </div>
-                      <p className={`text-xs ${active ? "text-neutral-300" : "text-neutral-500"}`}>
-                        원획 {c.wonStrokes}획
+                      <p className={`text-xs ${active ? (occult ? "text-red-200/50" : "text-neutral-300") : "text-white/35"}`}>
+                        원획 {c.wonStrokes} · 영적 획수
                       </p>
                     </div>
                   </div>
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${
-                      active ? "bg-white/15 text-white ring-white/20" : OHENG_STYLE[c.oheng]
-                    }`}
-                  >
-                    {c.oheng}행
-                  </span>
-                </button>
+                  {occult ? (
+                    <OhengRune oheng={c.oheng} size="sm" />
+                  ) : (
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${active ? "bg-white/15 text-white ring-white/20" : OHENG_STYLE[c.oheng]}`}>
+                      {c.oheng}행
+                    </span>
+                  )}
+                </motion.button>
               );
             })}
           </div>
@@ -159,17 +190,16 @@ export default function HanjaPicker({ hangul, index, selected, onSelect }: Props
             <button
               type="button"
               onClick={() => setExpanded(true)}
-              className="mt-3 w-full py-2 text-sm font-medium text-neutral-500 hover:text-neutral-900"
+              className={`mt-3 w-full py-2 text-sm ${occult ? "oc-btn oc-btn-ghost" : "font-medium text-neutral-500 hover:text-neutral-900"}`}
             >
               {filtered.length - 8}개 더 보기
             </button>
           )}
-
           {expanded && hasMore && (
             <button
               type="button"
               onClick={() => setExpanded(false)}
-              className="mt-3 w-full py-2 text-sm font-medium text-neutral-500 hover:text-neutral-900"
+              className={`mt-3 w-full py-2 text-sm ${occult ? "oc-btn oc-btn-ghost" : "font-medium text-neutral-500 hover:text-neutral-900"}`}
             >
               접기
             </button>
