@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   BIRTH_CITIES,
+  BIRTH_DISTRICTS_COUNT,
   formatCoordinates,
   formatCoordinatesKorean,
   getDistrict,
@@ -23,14 +24,23 @@ export default function BirthLocationPicker({
   setBirthCity,
   setBirthDistrict,
 }: Props) {
+  const [query, setQuery] = useState("");
   const districts = useMemo(
     () => (birthCity ? getDistrictsByCity(birthCity) : []),
     [birthCity],
   );
+  const filtered = useMemo(() => {
+    const q = query.trim();
+    if (!q) return districts;
+    return districts.filter((d) => d.label.includes(q));
+  }, [districts, query]);
+
   const selected: BirthDistrict | undefined = birthDistrict ? getDistrict(birthDistrict) : undefined;
+  const showSearch = districts.length > 8;
 
   function onCityChange(cityId: string) {
     setBirthCity(cityId);
+    setQuery("");
     const list = getDistrictsByCity(cityId);
     setBirthDistrict(list[0]?.id ?? "");
   }
@@ -39,7 +49,7 @@ export default function BirthLocationPicker({
     <div>
       <p className="mk-label mb-3">태생 좌표 (生所) — 시·군·구</p>
       <p className="mb-3 text-xs text-[var(--mk-ivory-muted)]">
-        태어난 곳의 위도·경도로 지기(地氣)를 정밀하게 반영합니다
+        전국 {BIRTH_DISTRICTS_COUNT}개 시·군·구 · 위도·경도로 지기(地氣)를 반영합니다
       </p>
 
       <select
@@ -57,19 +67,34 @@ export default function BirthLocationPicker({
       </select>
 
       {birthCity && districts.length > 0 && (
-        <select
-          value={birthDistrict}
-          onChange={(e) => setBirthDistrict(e.target.value)}
-          className="mk-input mt-3 w-full px-4 py-3.5 text-base"
-          aria-label="구·군·시"
-        >
-          <option value="">구·군·시 선택</option>
-          {districts.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.label}
-            </option>
-          ))}
-        </select>
+        <>
+          {showSearch && (
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`${districts.length}개 중 검색 (예: 수원, 강남)`}
+              className="mk-input mt-3 w-full px-4 py-3 text-sm"
+              aria-label="구·군·시 검색"
+            />
+          )}
+          <select
+            value={birthDistrict}
+            onChange={(e) => setBirthDistrict(e.target.value)}
+            className="mk-input mt-3 w-full px-4 py-3.5 text-base"
+            aria-label="구·군·시"
+          >
+            <option value="">구·군·시 선택 ({districts.length}개)</option>
+            {filtered.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+          {showSearch && query && filtered.length === 0 && (
+            <p className="mt-2 text-xs text-[var(--mk-cinnabar-soft)]">검색 결과가 없습니다.</p>
+          )}
+        </>
       )}
 
       {selected && (
@@ -91,7 +116,6 @@ export default function BirthLocationPicker({
 }
 
 function CoordinateMiniMap({ lat, lng }: { lat: number; lng: number }) {
-  // 한반도 대략 범위: lat 33~38.5, lng 125~130
   const x = ((lng - 125) / 5) * 100;
   const y = ((38.5 - lat) / 5.5) * 100;
   const cx = Math.max(4, Math.min(96, x));

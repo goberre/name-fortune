@@ -1,4 +1,5 @@
 import type { Oheng } from "@/lib/seongmyung";
+import { BIRTH_DISTRICTS_RAW, BIRTH_DISTRICTS_BY_CITY, BIRTH_DISTRICTS_COUNT } from "@/lib/birth-districts-list";
 
 export type BirthCity = {
   id: string;
@@ -6,15 +7,18 @@ export type BirthCity = {
   province: string;
 };
 
-export type BirthDistrict = {
+export type BirthDistrictRaw = {
   id: string;
   cityId: string;
   label: string;
   lat: number;
   lng: number;
+  terrain: string;
+};
+
+export type BirthDistrict = BirthDistrictRaw & {
   direction: "동" | "서" | "남" | "북" | "중";
   oheng: Oheng;
-  terrain: string;
 };
 
 /** 시·도 */
@@ -39,74 +43,39 @@ export const BIRTH_CITIES: BirthCity[] = [
   { id: "overseas", label: "해외·기타", province: "기타" },
 ];
 
-/** 구·군·시 — 위도·경도(대표 좌표) */
-export const BIRTH_DISTRICTS: BirthDistrict[] = [
-  // 서울 25구
-  { id: "seoul-gangnam", cityId: "seoul", label: "강남구", lat: 37.5172, lng: 127.0473, direction: "남", oheng: "화", terrain: "도시" },
-  { id: "seoul-seocho", cityId: "seoul", label: "서초구", lat: 37.4837, lng: 127.0324, direction: "남", oheng: "화", terrain: "도시" },
-  { id: "seoul-songpa", cityId: "seoul", label: "송파구", lat: 37.5145, lng: 127.1059, direction: "동", oheng: "목", terrain: "도시" },
-  { id: "seoul-gangdong", cityId: "seoul", label: "강동구", lat: 37.5301, lng: 127.1238, direction: "동", oheng: "목", terrain: "도시" },
-  { id: "seoul-mapo", cityId: "seoul", label: "마포구", lat: 37.5663, lng: 126.9019, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "seoul-yongsan", cityId: "seoul", label: "용산구", lat: 37.5326, lng: 126.9905, direction: "중", oheng: "토", terrain: "도시" },
-  { id: "seoul-jongno", cityId: "seoul", label: "종로구", lat: 37.5729, lng: 126.9794, direction: "중", oheng: "토", terrain: "도시" },
-  { id: "seoul-jung", cityId: "seoul", label: "중구", lat: 37.5641, lng: 126.9979, direction: "중", oheng: "토", terrain: "도시" },
-  { id: "seoul-gangbuk", cityId: "seoul", label: "강북구", lat: 37.6396, lng: 127.0257, direction: "북", oheng: "수", terrain: "도시" },
-  { id: "seoul-nowon", cityId: "seoul", label: "노원구", lat: 37.6542, lng: 127.0568, direction: "북", oheng: "수", terrain: "도시" },
-  { id: "seoul-dobong", cityId: "seoul", label: "도봉구", lat: 37.6688, lng: 127.0471, direction: "북", oheng: "수", terrain: "도시" },
-  { id: "seoul-eunpyeong", cityId: "seoul", label: "은평구", lat: 37.6027, lng: 126.9291, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "seoul-seodaemun", cityId: "seoul", label: "서대문구", lat: 37.5791, lng: 126.9368, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "seoul-yangcheon", cityId: "seoul", label: "양천구", lat: 37.5170, lng: 126.8664, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "seoul-guro", cityId: "seoul", label: "구로구", lat: 37.4954, lng: 126.8874, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "seoul-yeongdeungpo", cityId: "seoul", label: "영등포구", lat: 37.5264, lng: 126.8962, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "seoul-dongjak", cityId: "seoul", label: "동작구", lat: 37.5124, lng: 126.9393, direction: "남", oheng: "화", terrain: "도시" },
-  { id: "seoul-gwanak", cityId: "seoul", label: "관악구", lat: 37.4784, lng: 126.9516, direction: "남", oheng: "화", terrain: "도시" },
-  { id: "seoul-seongdong", cityId: "seoul", label: "성동구", lat: 37.5634, lng: 127.0366, direction: "동", oheng: "목", terrain: "도시" },
-  { id: "seoul-gwangjin", cityId: "seoul", label: "광진구", lat: 37.5385, lng: 127.0823, direction: "동", oheng: "목", terrain: "도시" },
-  { id: "seoul-dongdaemun", cityId: "seoul", label: "동대문구", lat: 37.5744, lng: 127.0396, direction: "동", oheng: "목", terrain: "도시" },
-  { id: "seoul-jungnang", cityId: "seoul", label: "중랑구", lat: 37.6066, lng: 127.0927, direction: "동", oheng: "목", terrain: "도시" },
-  { id: "seoul-seongbuk", cityId: "seoul", label: "성북구", lat: 37.5894, lng: 127.0167, direction: "북", oheng: "수", terrain: "도시" },
-  { id: "seoul-geumcheon", cityId: "seoul", label: "금천구", lat: 37.4569, lng: 126.8956, direction: "남", oheng: "화", terrain: "도시" },
-  { id: "seoul-gangseo", cityId: "seoul", label: "강서구", lat: 37.5509, lng: 126.8495, direction: "서", oheng: "금", terrain: "도시" },
+const CENTER_LAT = 36.3;
+const CENTER_LNG = 127.8;
 
-  // 부산
-  { id: "busan-haeundae", cityId: "busan", label: "해운대구", lat: 35.1631, lng: 129.1635, direction: "동", oheng: "목", terrain: "바다" },
-  { id: "busan-suyeong", cityId: "busan", label: "수영구", lat: 35.1455, lng: 129.1133, direction: "동", oheng: "목", terrain: "바다" },
-  { id: "busan-jung", cityId: "busan", label: "중구", lat: 35.1064, lng: 129.0324, direction: "남", oheng: "화", terrain: "바다" },
-  { id: "busan-sasang", cityId: "busan", label: "사상구", lat: 35.1527, lng: 128.9910, direction: "서", oheng: "금", terrain: "도시" },
+function deriveDirection(lat: number, lng: number): BirthDistrict["direction"] {
+  const dLat = lat - CENTER_LAT;
+  const dLng = lng - CENTER_LNG;
+  if (Math.abs(dLat) < 0.25 && Math.abs(dLng) < 0.25) return "중";
+  if (Math.abs(dLat) > Math.abs(dLng)) return dLat > 0 ? "북" : "남";
+  return dLng > 0 ? "동" : "서";
+}
 
-  // 인천
-  { id: "incheon-namdong", cityId: "incheon", label: "남동구", lat: 37.4486, lng: 126.7313, direction: "서", oheng: "금", terrain: "바다" },
-  { id: "incheon-bupyeong", cityId: "incheon", label: "부평구", lat: 37.5070, lng: 126.7219, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "incheon-yeonsu", cityId: "incheon", label: "연수구", lat: 37.4101, lng: 126.6784, direction: "서", oheng: "금", terrain: "바다" },
+function deriveOheng(lat: number, lng: number, terrain: string): Oheng {
+  if (terrain === "바다") return "수";
+  if (terrain === "산") return "목";
+  const dir = deriveDirection(lat, lng);
+  if (dir === "동") return "목";
+  if (dir === "서") return "금";
+  if (dir === "남") return "화";
+  if (dir === "북") return "수";
+  return "토";
+}
 
-  // 대구·대전·광주·울산·세종
-  { id: "daegu-suseong", cityId: "daegu", label: "수성구", lat: 35.8581, lng: 128.6309, direction: "동", oheng: "목", terrain: "도시" },
-  { id: "daegu-jung", cityId: "daegu", label: "중구", lat: 35.8694, lng: 128.6062, direction: "동", oheng: "목", terrain: "도시" },
-  { id: "daejeon-yuseong", cityId: "daejeon", label: "유성구", lat: 36.3626, lng: 127.3566, direction: "중", oheng: "토", terrain: "도시" },
-  { id: "daejeon-seo", cityId: "daejeon", label: "서구", lat: 36.3556, lng: 127.3838, direction: "중", oheng: "토", terrain: "도시" },
-  { id: "gwangju-seo", cityId: "gwangju", label: "서구", lat: 35.1520, lng: 126.8895, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "ulsan-nam", cityId: "ulsan", label: "남구", lat: 35.5439, lng: 129.3292, direction: "동", oheng: "목", terrain: "바다" },
-  { id: "sejong-center", cityId: "sejong", label: "세종시", lat: 36.4800, lng: 127.2890, direction: "중", oheng: "토", terrain: "도시" },
+function enrich(raw: BirthDistrictRaw): BirthDistrict {
+  return {
+    ...raw,
+    direction: deriveDirection(raw.lat, raw.lng),
+    oheng: deriveOheng(raw.lat, raw.lng, raw.terrain),
+  };
+}
 
-  // 경기 주요
-  { id: "gyeonggi-suwon", cityId: "gyeonggi", label: "수원시", lat: 37.2636, lng: 127.0286, direction: "중", oheng: "토", terrain: "도시" },
-  { id: "gyeonggi-seongnam", cityId: "gyeonggi", label: "성남시", lat: 37.4200, lng: 127.1265, direction: "남", oheng: "화", terrain: "도시" },
-  { id: "gyeonggi-goyang", cityId: "gyeonggi", label: "고양시", lat: 37.6584, lng: 126.8320, direction: "서", oheng: "금", terrain: "도시" },
-  { id: "gyeonggi-yongin", cityId: "gyeonggi", label: "용인시", lat: 37.2411, lng: 127.1776, direction: "남", oheng: "화", terrain: "도시" },
-  { id: "gyeonggi-bucheon", cityId: "gyeonggi", label: "부천시", lat: 37.5034, lng: 126.7660, direction: "서", oheng: "금", terrain: "도시" },
+export const BIRTH_DISTRICTS: BirthDistrict[] = BIRTH_DISTRICTS_RAW.map(enrich);
 
-  // 도 단위 대표
-  { id: "gangwon-chuncheon", cityId: "gangwon", label: "춘천시", lat: 37.8813, lng: 127.7298, direction: "동", oheng: "목", terrain: "산" },
-  { id: "chungbuk-cheongju", cityId: "chungbuk", label: "청주시", lat: 36.6424, lng: 127.4890, direction: "중", oheng: "토", terrain: "평야" },
-  { id: "chungnam-cheonan", cityId: "chungnam", label: "천안시", lat: 36.8151, lng: 127.1139, direction: "서", oheng: "금", terrain: "평야" },
-  { id: "jeonbuk-jeonju", cityId: "jeonbuk", label: "전주시", lat: 35.8242, lng: 127.1480, direction: "서", oheng: "금", terrain: "평야" },
-  { id: "jeonnam-gwangyang", cityId: "jeonnam", label: "광양시", lat: 34.9407, lng: 127.6959, direction: "남", oheng: "화", terrain: "바다" },
-  { id: "gyeongbuk-pohang", cityId: "gyeongbuk", label: "포항시", lat: 36.0190, lng: 129.3435, direction: "동", oheng: "목", terrain: "바다" },
-  { id: "gyeongnam-changwon", cityId: "gyeongnam", label: "창원시", lat: 35.2280, lng: 128.6811, direction: "남", oheng: "화", terrain: "바다" },
-  { id: "jeju-jeju", cityId: "jeju", label: "제주시", lat: 33.4996, lng: 126.5312, direction: "남", oheng: "화", terrain: "바다" },
-  { id: "jeju-seogwipo", cityId: "jeju", label: "서귀포시", lat: 33.2541, lng: 126.5600, direction: "남", oheng: "화", terrain: "바다" },
-  { id: "overseas-other", cityId: "overseas", label: "해외·기타", lat: 37.5665, lng: 126.9780, direction: "중", oheng: "토", terrain: "기타" },
-];
+export { BIRTH_DISTRICTS_COUNT, BIRTH_DISTRICTS_BY_CITY };
 
 export function getCity(id: string): BirthCity | undefined {
   return BIRTH_CITIES.find((c) => c.id === id);
@@ -139,8 +108,8 @@ export function formatCoordinatesKorean(lat: number, lng: number): string {
 
 /** 좌표 기반 미세 방위 (한반도 중심 36.3°N, 127.8°E 기준) */
 export function deriveMicroDirection(lat: number, lng: number): string {
-  const dLat = lat - 36.3;
-  const dLng = lng - 127.8;
+  const dLat = lat - CENTER_LAT;
+  const dLng = lng - CENTER_LNG;
   if (Math.abs(dLat) < 0.3 && Math.abs(dLng) < 0.3) return "중심부";
   const parts: string[] = [];
   if (dLat > 0.3) parts.push("북쪽");
@@ -148,4 +117,13 @@ export function deriveMicroDirection(lat: number, lng: number): string {
   if (dLng > 0.3) parts.push("동쪽");
   else if (dLng < -0.3) parts.push("서쪽");
   return parts.join("·") || "중심부";
+}
+
+/** 커버리지 검증용 */
+export function getDistrictCoverageReport(): { cityId: string; label: string; count: number }[] {
+  return BIRTH_CITIES.map((c) => ({
+    cityId: c.id,
+    label: c.label,
+    count: getDistrictsByCity(c.id).length,
+  }));
 }
