@@ -246,31 +246,31 @@ body {
 .spirit-svg {
   height: 7rem;
   width: 5rem;
-  opacity: 0.45;
+  opacity: 0.55;
 }
 
 .spirit-svg-sm {
   height: 6rem;
   width: 4rem;
-  opacity: 0.38;
+  opacity: 0.48;
 }
 
 .baekho-svg {
   height: 5.5rem;
   width: 14rem;
-  opacity: 0.42;
+  opacity: 0.52;
 }
 
 @media (min-width: 640px) {
   .spirit-svg {
     height: 9rem;
     width: 6.5rem;
-    opacity: 0.5;
+    opacity: 0.62;
   }
   .baekho-svg {
     height: 7rem;
     width: 18rem;
-    opacity: 0.48;
+    opacity: 0.58;
   }
 }
 
@@ -292,6 +292,7 @@ body {
   position: absolute;
   bottom: 28%;
   z-index: 3;
+  filter: drop-shadow(0 0 12px rgba(134, 239, 172, 0.6));
 }
 
 .dok-spirit-1 {
@@ -312,6 +313,7 @@ body {
   flex-direction: column;
   align-items: center;
   animation: nf-baekho 11s linear infinite 0.8s;
+  filter: drop-shadow(0 0 16px rgba(226, 232, 240, 0.4));
 }
 
 .baekho-label {
