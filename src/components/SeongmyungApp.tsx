@@ -1,13 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AnalysisPanels from "@/components/seongmyung/AnalysisPanels";
 import HanjaPicker from "@/components/seongmyung/HanjaPicker";
 import OhengHarmonyPanel from "@/components/seongmyung/OhengHarmonyPanel";
 import SagyeokTimeline from "@/components/seongmyung/SagyeokTimeline";
 import ScoreGauge from "@/components/seongmyung/ScoreGauge";
-import { getHanjaCandidates, type HanjaSelection } from "@/lib/hanja";
+import { getHanjaCandidates, loadHanjaIndex, type HanjaSelection } from "@/lib/hanja";
 import {
   analyzeSeongmyung,
   isValidKoreanName,
@@ -27,6 +27,7 @@ export default function SeongmyungApp() {
   const [birthMonth, setBirthMonth] = useState("");
   const [birthDay, setBirthDay] = useState("");
   const [hanjaSelections, setHanjaSelections] = useState<(HanjaSelection | null)[]>([]);
+  const [hanjaIndexReady, setHanjaIndexReady] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [result, setResult] = useState<SeongmyungResult | null>(null);
   const [error, setError] = useState("");
@@ -37,18 +38,42 @@ export default function SeongmyungApp() {
     (value: string) => {
       const next = isComposing ? value.slice(0, 4) : sanitizeName(value);
       setName(next);
-      setHanjaSelections((prev) => {
-        const nextSel = next.split("").map((ch, i) => {
+      setHanjaSelections((prev) =>
+        next.split("").map((ch, i) => {
           const existing = prev[i];
           if (existing?.hangul === ch) return existing;
-          const candidates = getHanjaCandidates(ch);
-          return candidates[0] ? { hangul: ch, ...candidates[0] } : null;
-        });
-        return nextSel;
-      });
+          return null;
+        }),
+      );
     },
     [isComposing],
   );
+
+  useEffect(() => {
+    if (step !== 2) return;
+    loadHanjaIndex()
+      .then(() => setHanjaIndexReady(true))
+      .catch(() => setError("한자 데이터를 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요."));
+  }, [step]);
+
+  useEffect(() => {
+    if (step !== 2 || !hanjaIndexReady) return;
+    let cancelled = false;
+    (async () => {
+      const next = await Promise.all(
+        chars.map(async (ch, i) => {
+          if (hanjaSelections[i]?.hangul === ch) return hanjaSelections[i];
+          const list = await getHanjaCandidates(ch);
+          return list[0] ? { hangul: ch, ...list[0] } : null;
+        }),
+      );
+      if (!cancelled) setHanjaSelections(next);
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- auto-pick first candidate per char
+  }, [step, hanjaIndexReady, name]);
 
   function handleHanjaSelect(index: number, selection: HanjaSelection) {
     setHanjaSelections((prev) => {
