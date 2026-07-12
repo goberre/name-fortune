@@ -6,10 +6,10 @@ export default function MysticAmbience() {
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
       <div className="myst-void" />
       <div className="myst-blood-moon" />
-      <FolklorePassers />
       <div className="myst-vignette" />
       <div className="myst-fog myst-fog-1" />
       <div className="myst-fog myst-fog-2" />
+      <FolklorePassers />
       <div className="myst-candle myst-candle-l" />
       <div className="myst-candle myst-candle-r" />
       {Array.from({ length: 8 }).map((_, i) => (

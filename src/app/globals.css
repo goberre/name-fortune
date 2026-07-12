@@ -179,7 +179,8 @@ body {
 .myst-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.55) 100%);
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.45) 100%);
+  pointer-events: none;
 }
 .myst-fog {
   position: absolute;
@@ -237,35 +238,87 @@ body {
 .folklore-layer {
   position: absolute;
   inset: 0;
-  contain: strict;
+  z-index: 2;
   overflow: hidden;
+  pointer-events: none;
 }
+
+.spirit-svg {
+  height: 7rem;
+  width: 5rem;
+  opacity: 0.45;
+}
+
+.spirit-svg-sm {
+  height: 6rem;
+  width: 4rem;
+  opacity: 0.38;
+}
+
+.baekho-svg {
+  height: 5.5rem;
+  width: 14rem;
+  opacity: 0.42;
+}
+
+@media (min-width: 640px) {
+  .spirit-svg {
+    height: 9rem;
+    width: 6.5rem;
+    opacity: 0.5;
+  }
+  .baekho-svg {
+    height: 7rem;
+    width: 18rem;
+    opacity: 0.48;
+  }
+}
+
 .dok-fire {
   position: absolute;
+  z-index: 1;
   animation: nf-drift 7s ease-in-out infinite;
 }
+
 .dok-fire-core {
   position: absolute;
   inset: 0;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   background: radial-gradient(ellipse at 50% 70%, #bbf7d0, #4ade80, #22d3ee, transparent);
-  box-shadow: 0 0 14px rgba(74, 222, 128, 0.6);
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.75);
 }
+
 .dok-spirit {
   position: absolute;
-  bottom: 22%;
+  bottom: 28%;
+  z-index: 3;
 }
+
 .dok-spirit-1 {
-  animation: nf-dok-pass 10s linear infinite;
+  animation: nf-dok-pass 9s linear infinite;
 }
+
 .dok-spirit-2 {
-  bottom: 36%;
-  animation: nf-dok-pass-rev 10s linear infinite 2s;
+  bottom: 48%;
+  animation: nf-dok-pass-rev 9s linear infinite 2s;
 }
+
 .baekho-spirit {
   position: absolute;
-  top: 54%;
-  animation: nf-baekho 12s linear infinite 1s;
+  top: 38%;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: nf-baekho 11s linear infinite 0.8s;
+}
+
+.baekho-label {
+  margin-top: 0.25rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.35em;
+  color: rgba(226, 232, 240, 0.35);
 }
 @keyframes nf-drift {
   0%,
@@ -284,43 +337,46 @@ body {
 }
 @keyframes nf-dok-pass {
   0% {
-    transform: translateX(-100px);
+    transform: translateX(-120px);
     opacity: 0;
   }
-  5% {
-    opacity: 0.15;
+  3% {
+    opacity: 0.85;
   }
-  95% {
-    opacity: 0.1;
+  97% {
+    opacity: 0.7;
   }
   100% {
-    transform: translateX(calc(100vw + 100px));
+    transform: translateX(calc(100vw + 120px));
     opacity: 0;
   }
 }
 @keyframes nf-dok-pass-rev {
   0% {
-    transform: translateX(calc(100vw + 80px)) scaleX(-1);
+    transform: translateX(calc(100vw + 100px)) scaleX(-1);
     opacity: 0;
   }
-  5% {
-    opacity: 0.12;
+  3% {
+    opacity: 0.75;
   }
   100% {
-    transform: translateX(-100px) scaleX(-1);
+    transform: translateX(-120px) scaleX(-1);
     opacity: 0;
   }
 }
 @keyframes nf-baekho {
   0% {
-    transform: translateX(-20vw);
+    transform: translateX(-25vw);
     opacity: 0;
   }
-  8% {
-    opacity: 0.1;
+  4% {
+    opacity: 0.9;
+  }
+  96% {
+    opacity: 0.65;
   }
   100% {
-    transform: translateX(110vw);
+    transform: translateX(105vw);
     opacity: 0;
   }
 }
