@@ -5,17 +5,18 @@ import GuaFrame from "@/components/musok/GuaFrame";
 
 const PHASES = [
   "사주 선천운을 펼치는 중…",
-  "한자 획수를 헤아리는 중…",
-  "오행 상생·상극을 짚는 중…",
   "신수 명통을 여는 중…",
 ] as const;
+
+const PHASE_MS = 180;
+const DONE_MS = PHASE_MS * PHASES.length + 120;
 
 export default function MusokLoader({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
-    const timers = PHASES.map((_, i) => window.setTimeout(() => setPhase(i), i * 650));
-    const done = window.setTimeout(onComplete, PHASES.length * 650 + 500);
+    const timers = PHASES.map((_, i) => window.setTimeout(() => setPhase(i), i * PHASE_MS));
+    const done = window.setTimeout(onComplete, DONE_MS);
     return () => {
       timers.forEach(clearTimeout);
       clearTimeout(done);

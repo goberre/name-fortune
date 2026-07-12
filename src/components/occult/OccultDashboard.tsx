@@ -17,8 +17,8 @@ export default function OccultDashboard({
   result: SeongmyungResult;
   onReset: () => void;
 }) {
-  const region = result.birthDate?.birthRegion
-    ? getBirthRegion(result.birthDate.birthRegion)
+  const region = result.birthDate?.birthDistrict
+    ? getBirthRegion(result.birthDate.birthDistrict)
     : undefined;
 
   return (

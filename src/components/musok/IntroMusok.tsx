@@ -15,9 +15,9 @@ export default function IntroMusok({ onEnter }: { onEnter: () => void }) {
       <GuaFrame className="absolute opacity-20" />
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 1 }}
+        transition={{ delay: 0.15, duration: 0.5 }}
         className="relative z-10 max-w-lg"
       >
         <p className="mk-kicker">명통(命通)의 시작</p>
@@ -27,7 +27,7 @@ export default function IntroMusok({ onEnter }: { onEnter: () => void }) {
               key={line}
               initial={{ opacity: 0, filter: "blur(4px)" }}
               animate={{ opacity: 1, filter: "blur(0px)" }}
-              transition={{ delay: 0.8 + i * 0.6, duration: 0.9 }}
+              transition={{ delay: 0.25 + i * 0.2, duration: 0.6 }}
               className="font-musok text-lg leading-relaxed text-[var(--mk-ivory)] sm:text-xl"
             >
               {line}
@@ -37,16 +37,16 @@ export default function IntroMusok({ onEnter }: { onEnter: () => void }) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 2.2 }}
+          transition={{ delay: 0.7 }}
           className="mt-10 text-sm leading-relaxed text-[var(--mk-ivory-dim)]"
         >
           {MUSOK_MOTTO}
         </motion.p>
         <motion.button
           type="button"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2.8 }}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.85, duration: 0.4 }}
           onClick={onEnter}
           className="mk-btn mk-btn-primary mt-12 px-12"
         >

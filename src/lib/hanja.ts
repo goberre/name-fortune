@@ -30,6 +30,7 @@ type HanjaIndexMeta = {
 
 let cache: HanjaIndexMeta | null = null;
 let loadPromise: Promise<HanjaIndexMeta> | null = null;
+const candidateCache = new Map<string, HanjaCandidate[]>();
 
 /** 자원오행 추론 — 부수·키워드 기반 (성명학 참고용) */
 const HANJA_OHENG: Record<string, Oheng> = {
@@ -87,9 +88,14 @@ export async function loadHanjaIndex(): Promise<HanjaIndexMeta> {
 }
 
 export async function getHanjaCandidates(hangul: string): Promise<HanjaCandidate[]> {
+  const cached = candidateCache.get(hangul);
+  if (cached) return cached;
+
   const data = await loadHanjaIndex();
   const raw = data.index[hangul] ?? [];
-  return sortCandidates(hangul, raw.map(enrich));
+  const result = sortCandidates(hangul, raw.map(enrich));
+  candidateCache.set(hangul, result);
+  return result;
 }
 
 export { isPopularHanja };

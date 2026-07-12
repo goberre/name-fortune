@@ -1,6 +1,7 @@
 "use client";
 
 import type { CalendarType, Gender } from "@/types/birth";
+import BirthLocationPicker from "@/components/musok/BirthLocationPicker";
 
 type Props = {
   name: string;
@@ -10,8 +11,8 @@ type Props = {
   birthYear: string;
   birthMonth: string;
   birthDay: string;
-  birthHour: string;
-  birthMinute: string;
+  birthCity: string;
+  birthDistrict: string;
   isComposing: boolean;
   error: string;
   onNameChange: (v: string) => void;
@@ -23,9 +24,13 @@ type Props = {
   setBirthYear: (v: string) => void;
   setBirthMonth: (v: string) => void;
   setBirthDay: (v: string) => void;
-  setBirthHour: (v: string) => void;
-  setBirthMinute: (v: string) => void;
+  setBirthCity: (v: string) => void;
+  setBirthDistrict: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
+  kicker?: string;
+  title?: string;
+  subtitle?: string;
+  submitLabel?: string;
 };
 
 function Segmented<T extends string>({
@@ -58,13 +63,16 @@ function Segmented<T extends string>({
 }
 
 export default function Step1Form(props: Props) {
+  const kicker = props.kicker ?? "생년천기 (生年天氣)";
+  const title = props.title ?? "선천 사주 기록";
+  const subtitle = props.subtitle ?? "태어난 해·달·날과 태생 좌표(지기)를 고합니다.";
+  const submitLabel = props.submitLabel ?? "명줄 보완(補完)으로 — 字";
+
   return (
     <form onSubmit={props.onSubmit} className="mk-card p-6 sm:p-10">
-      <p className="mk-kicker">생년천기 (生年天氣)</p>
-      <h2 className="font-musok mt-2 text-2xl text-[var(--mk-ivory)]">선천 사주 기록</h2>
-      <p className="mt-2 text-sm text-[var(--mk-ivory-dim)]">
-        태어난 해와 달, 날과 시의 기운(사주선천운)을 먼저 고합니다.
-      </p>
+      <p className="mk-kicker">{kicker}</p>
+      <h2 className="font-musok mt-2 text-2xl text-[var(--mk-ivory)]">{title}</h2>
+      <p className="mt-2 text-sm text-[var(--mk-ivory-dim)]">{subtitle}</p>
 
       <div className="mt-8">
         <label htmlFor="name" className="mk-label">
@@ -145,38 +153,18 @@ export default function Step1Form(props: Props) {
       </div>
 
       <div className="mt-8">
-        <p className="mk-label mb-3">태어난 시 (時)</p>
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            type="number"
-            placeholder="14"
-            min={0}
-            max={23}
-            value={props.birthHour}
-            onChange={(e) => props.setBirthHour(e.target.value.slice(0, 2))}
-            className="mk-input px-4 py-3.5 text-center text-lg"
-            aria-label="시"
-          />
-          <input
-            type="number"
-            placeholder="30"
-            min={0}
-            max={59}
-            value={props.birthMinute}
-            onChange={(e) => props.setBirthMinute(e.target.value.slice(0, 2))}
-            className="mk-input px-4 py-3.5 text-center text-lg"
-            aria-label="분"
-          />
-        </div>
-        <p className="mt-2 text-[10px] text-[var(--mk-ivory-muted)]">
-          모르시면 비워 두셔도 됩니다. 시주(時柱)는 입력 시에만 반영합니다.
-        </p>
+        <BirthLocationPicker
+          birthCity={props.birthCity}
+          birthDistrict={props.birthDistrict}
+          setBirthCity={props.setBirthCity}
+          setBirthDistrict={props.setBirthDistrict}
+        />
       </div>
 
       {props.error && <p className="mt-4 text-center text-sm text-[var(--mk-cinnabar-soft)]">{props.error}</p>}
 
       <button type="submit" disabled={props.name.length < 2} className="mk-btn mk-btn-primary mt-10">
-        명줄 보완(補完)으로 — 字
+        {submitLabel}
       </button>
     </form>
   );
@@ -186,23 +174,18 @@ export function buildBirthProfile(p: {
   birthYear: string;
   birthMonth: string;
   birthDay: string;
-  birthHour: string;
-  birthMinute: string;
+  birthDistrict: string;
   gender: Gender;
   calendarType: CalendarType;
   isLeapMonth: boolean;
-  birthRegion?: string;
 }) {
-  const profile: import("@/types/birth").BirthProfile = {
+  return {
     year: Number(p.birthYear),
     month: Number(p.birthMonth),
     day: Number(p.birthDay),
+    birthDistrict: p.birthDistrict,
     gender: p.gender,
     calendarType: p.calendarType,
     isLeapMonth: p.isLeapMonth,
-  };
-  if (p.birthHour !== "") profile.hour = Number(p.birthHour);
-  if (p.birthMinute !== "") profile.minute = Number(p.birthMinute);
-  if (p.birthRegion) profile.birthRegion = p.birthRegion;
-  return profile;
+  } satisfies import("@/types/birth").BirthProfile;
 }

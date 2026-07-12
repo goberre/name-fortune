@@ -190,6 +190,17 @@ body {
 
 .mk-loader { color: var(--mk-ivory-dim); }
 
+.mk-ad-slot {
+  border: 1px dashed var(--mk-border);
+  background: rgba(245, 240, 232, 0.02);
+}
+
+.mk-premium-blur {
+  filter: blur(5px);
+  max-height: 420px;
+  overflow: hidden;
+}
+
 .font-occult {
   font-family: "Noto Serif KR", Georgia, serif;
 }

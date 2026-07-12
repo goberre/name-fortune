@@ -46,13 +46,11 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError("");
     getHanjaCandidates(hangul)
       .then((list) => {
         if (!cancelled) {
           setCandidates(list);
-          if (list.length === 0) setError(`「${hangul}」에 해당하는 인명용 한자가 없습니다.`);
+          setError(list.length === 0 ? `「${hangul}」에 해당하는 인명용 한자가 없습니다.` : "");
         }
       })
       .catch((e) => {

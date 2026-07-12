@@ -1,10 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
+import AdSlot from "@/components/monetization/AdSlot";
+import CoupangSlot from "@/components/monetization/CoupangSlot";
 import BrushText from "@/components/musok/BrushText";
+import CoupleUpsellCard from "@/components/musok/CoupleUpsellCard";
 import HanjiTimeline from "@/components/musok/HanjiTimeline";
+import MusokBirthPlacePanel from "@/components/musok/MusokBirthPlacePanel";
 import OhengSalpuriGuide from "@/components/musok/OhengSalpuriGuide";
 import SinsuMyeongtongGauge from "@/components/musok/SinsuMyeongtongGauge";
+import { adsConfig } from "@/config/ads";
+import { getFullDistrictLabel } from "@/lib/birth-districts";
 import { MUSOK_MOTTO } from "@/lib/musok-copy";
 import type { SeongmyungResult } from "@/lib/seongmyung";
 import { CALENDAR_LABEL, GENDER_LABEL } from "@/types/birth";
@@ -12,13 +18,14 @@ import { CALENDAR_LABEL, GENDER_LABEL } from "@/types/birth";
 export default function MusokDashboard({
   result,
   onReset,
+  onStartCouple,
 }: {
   result: SeongmyungResult;
   onReset: () => void;
+  onStartCouple?: () => void;
 }) {
   const bd = result.birthDate;
-  const timeStr =
-    bd?.hour !== undefined ? ` ${bd.hour}시${bd.minute !== undefined ? ` ${bd.minute}분` : ""}` : "";
+  const placeLabel = bd?.birthDistrict ? getFullDistrictLabel(bd.birthDistrict) : undefined;
 
   return (
     <motion.div
@@ -38,14 +45,31 @@ export default function MusokDashboard({
           <p className="mt-3 text-center text-[10px] tracking-wider text-[var(--mk-ivory-muted)]">
             {GENDER_LABEL[bd.gender]} · {CALENDAR_LABEL[bd.calendarType]}
             {bd.isLeapMonth ? " · 윤달" : ""} · {bd.year}.{bd.month}.{bd.day}
-            {timeStr}
+            {placeLabel ? ` · ${placeLabel}` : ""}
+          </p>
+        )}
+        {result.sajuProfile?.regionLat !== undefined && result.sajuProfile.regionLng !== undefined && (
+          <p className="mt-1 text-center font-mono text-[10px] text-[var(--mk-cinnabar-soft)]">
+            {result.sajuProfile.regionLat.toFixed(4)}°N, {result.sajuProfile.regionLng.toFixed(4)}°E
           </p>
         )}
       </motion.div>
 
+      {adsConfig.adsenseSlotTop && (
+        <motion.div variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}>
+          <AdSlot slotId={adsConfig.adsenseSlotTop} className="mx-auto max-w-md" />
+        </motion.div>
+      )}
+
       <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="mk-card p-5">
         <BrushText text={MUSOK_MOTTO} className="text-center text-sm italic text-[var(--mk-ivory-dim)]" />
       </motion.div>
+
+      {result.birthRegionAnalysis && (
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+          <MusokBirthPlacePanel analysis={result.birthRegionAnalysis} />
+        </motion.div>
+      )}
 
       {result.futureFortune && (
         <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="mk-card p-6">
@@ -54,6 +78,13 @@ export default function MusokDashboard({
             text={result.futureFortune.focusMessage}
             className="mt-3 text-sm leading-relaxed text-[var(--mk-ivory-dim)]"
           />
+        </motion.div>
+      )}
+
+      {(adsConfig.adsenseSlotMid || adsConfig.coupangWidgetId) && (
+        <motion.div variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }} className="space-y-4">
+          {adsConfig.adsenseSlotMid && <AdSlot slotId={adsConfig.adsenseSlotMid} />}
+          <CoupangSlot />
         </motion.div>
       )}
 
@@ -75,6 +106,12 @@ export default function MusokDashboard({
           birthDay={bd?.day}
         />
       </motion.div>
+
+      {onStartCouple && (
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+          <CoupleUpsellCard onStart={onStartCouple} />
+        </motion.div>
+      )}
 
       <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
         <button type="button" onClick={onReset} className="mk-btn mk-btn-ghost w-full">

@@ -6,11 +6,13 @@ import KoreaRegionChart from "@/components/infographics/KoreaRegionChart";
 import WhyRegionMatters from "@/components/infographics/WhyRegionMatters";
 import { OhengBadge } from "@/components/seongmyung/HanjaPicker";
 import type { BirthRegionAnalysis } from "@/lib/birth-region";
+import { getBirthRegion } from "@/lib/birth-region";
 
 const DIRECTION_LABEL = { 동: "동쪽", 서: "서쪽", 남: "남쪽", 북: "북쪽", 중: "중앙" } as const;
 
 export default function BirthRegionPanel({ analysis }: { analysis: BirthRegionAnalysis }) {
-  const { region, gilHeung, matchScore } = analysis;
+  const region = getBirthRegion(analysis.district.id)!;
+  const { gilHeung, matchScore } = analysis;
   const statusColor =
     gilHeung === "길"
       ? "text-emerald-600 bg-emerald-50"

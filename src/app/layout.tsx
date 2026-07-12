@@ -45,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="home" href={brandUrls.hub} />
+        <link rel="preload" href="/data/hanja-index.json" as="fetch" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
