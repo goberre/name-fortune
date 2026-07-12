@@ -27,6 +27,7 @@ export type SajuOhengProfile = {
   yearOheng: Oheng;
   monthOheng: Oheng;
   dayOheng: Oheng;
+  hourOheng?: Oheng;
   regionOheng?: Oheng;
   regionLabel?: string;
   distribution: Record<Oheng, number>;
@@ -46,6 +47,10 @@ function daySexagenaryIndex(year: number, month: number, day: number): number {
 function monthBranchIndex(month: number): number {
   const map = [11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   return map[Math.max(0, Math.min(11, month - 1))];
+}
+
+function hourBranchIndex(hour: number): number {
+  return Math.floor(((hour + 1) % 24) / 2) % 12;
 }
 
 /** 부족한 오행의 상생 원천 = 희신(喜神) 후보 */
@@ -69,12 +74,17 @@ export function analyzeSajuOheng(birth: BirthProfile): SajuOhengProfile {
   const dayOheng = STEM_OHENG[dayStem];
   const monthOheng = BRANCH_OHENG[monthBranch];
 
-  const region = getBirthRegion(birth.birthRegion);
+  let hourOheng: Oheng | undefined;
+  if (birth.hour !== undefined && birth.hour >= 0 && birth.hour <= 23) {
+    hourOheng = BRANCH_OHENG[hourBranchIndex(birth.hour)];
+  }
+
+  const region = birth.birthRegion ? getBirthRegion(birth.birthRegion) : undefined;
   const regionOheng = region?.oheng;
   const regionLabel = region?.label;
 
   const distribution: Record<Oheng, number> = { 목: 0, 화: 0, 토: 0, 금: 0, 수: 0 };
-  for (const o of [yearOheng, monthOheng, dayOheng, regionOheng].filter(Boolean) as Oheng[]) {
+  for (const o of [yearOheng, monthOheng, dayOheng, hourOheng, regionOheng].filter(Boolean) as Oheng[]) {
     distribution[o]++;
   }
 
@@ -85,6 +95,10 @@ export function analyzeSajuOheng(birth: BirthProfile): SajuOhengProfile {
     lacking.length > 0
       ? `사주에 ${lacking.map((o) => `${o}행`).join(", ")} 기운이 부족합니다. 이름 한자의 자원오행으로 보완 여부를 확인해 주세요.`
       : "사주에 오행이 고르게 분포되어 있습니다. 이름 한자와의 조화를 확인해 주세요.";
+
+  if (hourOheng) {
+    summary += ` 시주(時柱) ${hourOheng}행 기운을 반영했습니다.`;
+  }
 
   if (regionLabel && regionOheng) {
     summary += ` 태생지 ${regionLabel}의 ${regionOheng}행 지기(地氣)를 반영했습니다.`;
@@ -105,6 +119,7 @@ export function analyzeSajuOheng(birth: BirthProfile): SajuOhengProfile {
     yearOheng,
     monthOheng,
     dayOheng,
+    hourOheng,
     regionOheng,
     regionLabel,
     distribution,

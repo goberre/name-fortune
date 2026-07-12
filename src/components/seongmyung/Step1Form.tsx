@@ -1,7 +1,6 @@
 "use client";
 
 import type { CalendarType, Gender } from "@/types/birth";
-import { BIRTH_REGIONS } from "@/lib/birth-region";
 
 type Props = {
   name: string;
@@ -11,7 +10,8 @@ type Props = {
   birthYear: string;
   birthMonth: string;
   birthDay: string;
-  birthRegion: string;
+  birthHour: string;
+  birthMinute: string;
   isComposing: boolean;
   error: string;
   onNameChange: (v: string) => void;
@@ -23,7 +23,8 @@ type Props = {
   setBirthYear: (v: string) => void;
   setBirthMonth: (v: string) => void;
   setBirthDay: (v: string) => void;
-  setBirthRegion: (v: string) => void;
+  setBirthHour: (v: string) => void;
+  setBirthMinute: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 };
 
@@ -37,16 +38,16 @@ function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="flex rounded-none border border-red-900/30 bg-black/40 p-1">
+    <div className="flex border border-[var(--mk-border)] bg-[var(--mk-charcoal-light)] p-1">
       {options.map((opt) => (
         <button
           key={opt.id}
           type="button"
           onClick={() => onChange(opt.id)}
-          className={`flex-1 rounded-none py-2.5 text-sm font-medium transition ${
+          className={`flex-1 py-2.5 text-sm transition ${
             value === opt.id
-              ? "bg-red-950/60 text-red-100 shadow-[0_0_12px_rgba(127,29,29,0.4)]"
-              : "text-white/40 hover:text-white/70"
+              ? "bg-[var(--mk-ivory)]/10 text-[var(--mk-ivory)]"
+              : "text-[var(--mk-ivory-muted)] hover:text-[var(--mk-ivory-dim)]"
           }`}
         >
           {opt.label}
@@ -58,14 +59,16 @@ function Segmented<T extends string>({
 
 export default function Step1Form(props: Props) {
   return (
-    <form onSubmit={props.onSubmit} className="oc-card relative p-6 sm:p-10">
-      <p className="oc-kicker">Step I · 生</p>
-      <h2 className="font-occult mt-2 text-2xl text-white">명주의 태생</h2>
-      <p className="mt-2 text-sm text-white/40">태어난 시간과 우주의 천기, 대지의 좌표를 기록하십시오</p>
+    <form onSubmit={props.onSubmit} className="mk-card p-6 sm:p-10">
+      <p className="mk-kicker">생년천기 (生年天氣)</p>
+      <h2 className="font-musok mt-2 text-2xl text-[var(--mk-ivory)]">선천 사주 기록</h2>
+      <p className="mt-2 text-sm text-[var(--mk-ivory-dim)]">
+        태어난 해와 달, 날과 시의 기운(사주선천운)을 먼저 고합니다.
+      </p>
 
       <div className="mt-8">
-        <label htmlFor="name" className="oc-label">
-          영적 호칭 (한글 이름)
+        <label htmlFor="name" className="mk-label">
+          한글 이름
         </label>
         <input
           id="name"
@@ -76,25 +79,24 @@ export default function Step1Form(props: Props) {
           placeholder="홍길동"
           maxLength={4}
           lang="ko"
-          className="oc-input oc-input-glow mt-3 px-5 py-5 text-center font-occult text-3xl tracking-[0.2em]"
+          className="mk-input mt-3 px-5 py-5 text-center font-musok text-3xl tracking-[0.15em]"
         />
-        <p className="mt-2 text-center text-[10px] tracking-widest text-white/25">2~4자 · 성+이름</p>
       </div>
 
       <div className="mt-8">
-        <p className="oc-label mb-3">음과 양</p>
+        <p className="mk-label mb-3">음양 (성별)</p>
         <Segmented
           value={props.gender}
           options={[
-            { id: "male", label: "陽" },
-            { id: "female", label: "陰" },
+            { id: "male", label: "남 (陽)" },
+            { id: "female", label: "여 (陰)" },
           ]}
           onChange={props.setGender}
         />
       </div>
 
       <div className="mt-8">
-        <p className="oc-label mb-3">천상의 기록 (생년월일)</p>
+        <p className="mk-label mb-3">생년월일</p>
         <Segmented
           value={props.calendarType}
           options={[
@@ -104,73 +106,77 @@ export default function Step1Form(props: Props) {
           onChange={props.setCalendarType}
         />
         {props.calendarType === "lunar" && (
-          <label className="mt-3 flex items-center gap-2 text-sm text-red-200/60">
+          <label className="mt-3 flex items-center gap-2 text-sm text-[var(--mk-ivory-dim)]">
             <input
               type="checkbox"
               checked={props.isLeapMonth}
               onChange={(e) => props.setIsLeapMonth(e.target.checked)}
-              className="h-4 w-4 border-red-900 bg-black"
+              className="h-4 w-4"
             />
-            윤달 — 달의 그림자
+            윤달 (閏月)
           </label>
         )}
         <div className="mt-3 grid grid-cols-3 gap-3">
           <input
             type="number"
-            inputMode="numeric"
             placeholder="1990"
             value={props.birthYear}
             onChange={(e) => props.setBirthYear(e.target.value.slice(0, 4))}
-            className="oc-input oc-input-glow px-4 py-3.5 text-center text-lg"
+            className="mk-input px-4 py-3.5 text-center text-lg"
             aria-label="년"
           />
           <input
             type="number"
-            inputMode="numeric"
             placeholder="01"
             value={props.birthMonth}
             onChange={(e) => props.setBirthMonth(e.target.value.slice(0, 2))}
-            className="oc-input oc-input-glow px-4 py-3.5 text-center text-lg"
+            className="mk-input px-4 py-3.5 text-center text-lg"
             aria-label="월"
           />
           <input
             type="number"
-            inputMode="numeric"
             placeholder="01"
             value={props.birthDay}
             onChange={(e) => props.setBirthDay(e.target.value.slice(0, 2))}
-            className="oc-input oc-input-glow px-4 py-3.5 text-center text-lg"
+            className="mk-input px-4 py-3.5 text-center text-lg"
             aria-label="일"
           />
         </div>
       </div>
 
       <div className="mt-8">
-        <label htmlFor="birthRegion" className="oc-label">
-          대지의 좌표 (태생지)
-        </label>
-        <select
-          id="birthRegion"
-          value={props.birthRegion}
-          onChange={(e) => props.setBirthRegion(e.target.value)}
-          className="oc-input oc-input-glow mt-3 w-full px-4 py-3.5 text-base"
-        >
-          <option value="">지역을 선택하십시오</option>
-          {BIRTH_REGIONS.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-        <p className="mt-2 text-[10px] tracking-wide text-indigo-300/40">
-          태어난 땅의 지기(地氣)가 우주 천기와 맞물려 운명의 방향을 결정합니다
+        <p className="mk-label mb-3">태어난 시 (時)</p>
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            type="number"
+            placeholder="14"
+            min={0}
+            max={23}
+            value={props.birthHour}
+            onChange={(e) => props.setBirthHour(e.target.value.slice(0, 2))}
+            className="mk-input px-4 py-3.5 text-center text-lg"
+            aria-label="시"
+          />
+          <input
+            type="number"
+            placeholder="30"
+            min={0}
+            max={59}
+            value={props.birthMinute}
+            onChange={(e) => props.setBirthMinute(e.target.value.slice(0, 2))}
+            className="mk-input px-4 py-3.5 text-center text-lg"
+            aria-label="분"
+          />
+        </div>
+        <p className="mt-2 text-[10px] text-[var(--mk-ivory-muted)]">
+          모르시면 비워 두셔도 됩니다. 시주(時柱)는 입력 시에만 반영합니다.
         </p>
       </div>
 
-      {props.error && <p className="mt-4 text-center text-sm text-red-400">{props.error}</p>}
+      {props.error && <p className="mt-4 text-center text-sm text-[var(--mk-cinnabar-soft)]">{props.error}</p>}
 
-      <button type="submit" disabled={props.name.length < 2} className="oc-btn oc-btn-primary mt-10">
-        한자 동조 의식으로 — 字
+      <button type="submit" disabled={props.name.length < 2} className="mk-btn mk-btn-primary mt-10">
+        명줄 보완(補完)으로 — 字
       </button>
     </form>
   );
@@ -180,18 +186,23 @@ export function buildBirthProfile(p: {
   birthYear: string;
   birthMonth: string;
   birthDay: string;
-  birthRegion: string;
+  birthHour: string;
+  birthMinute: string;
   gender: Gender;
   calendarType: CalendarType;
   isLeapMonth: boolean;
+  birthRegion?: string;
 }) {
-  return {
+  const profile: import("@/types/birth").BirthProfile = {
     year: Number(p.birthYear),
     month: Number(p.birthMonth),
     day: Number(p.birthDay),
-    birthRegion: p.birthRegion,
     gender: p.gender,
     calendarType: p.calendarType,
     isLeapMonth: p.isLeapMonth,
   };
+  if (p.birthHour !== "") profile.hour = Number(p.birthHour);
+  if (p.birthMinute !== "") profile.minute = Number(p.birthMinute);
+  if (p.birthRegion) profile.birthRegion = p.birthRegion;
+  return profile;
 }

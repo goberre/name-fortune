@@ -2,9 +2,9 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import IntroRitual from "@/components/occult/IntroRitual";
-import OccultDashboard from "@/components/occult/OccultDashboard";
-import OracleLoader from "@/components/OracleLoader";
+import IntroMusok from "@/components/musok/IntroMusok";
+import MusokDashboard from "@/components/musok/MusokDashboard";
+import MusokLoader from "@/components/musok/MusokLoader";
 import HanjaPicker from "@/components/seongmyung/HanjaPicker";
 import Step1Form, { buildBirthProfile } from "@/components/seongmyung/Step1Form";
 import { getHanjaCandidates, loadHanjaIndex, type HanjaSelection } from "@/lib/hanja";
@@ -18,10 +18,10 @@ function sanitizeName(value: string) {
 type Step = "intro" | 1 | 2 | "loading" | "result";
 
 const slide = {
-  initial: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
+  initial: (dir: number) => ({ x: dir > 0 ? 32 : -32, opacity: 0 }),
   animate: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
-  transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
+  exit: (dir: number) => ({ x: dir > 0 ? -32 : 32, opacity: 0 }),
+  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
 };
 
 export default function SeongmyungApp() {
@@ -34,12 +34,14 @@ export default function SeongmyungApp() {
   const [birthYear, setBirthYear] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthDay, setBirthDay] = useState("");
-  const [birthRegion, setBirthRegion] = useState("");
+  const [birthHour, setBirthHour] = useState("");
+  const [birthMinute, setBirthMinute] = useState("");
   const [hanjaSelections, setHanjaSelections] = useState<(HanjaSelection | null)[]>([]);
   const [hanjaIndexReady, setHanjaIndexReady] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [result, setResult] = useState<SeongmyungResult | null>(null);
   const [error, setError] = useState("");
+  const [inkPulse, setInkPulse] = useState(false);
 
   const chars = useMemo(() => [...name], [name]);
 
@@ -68,7 +70,7 @@ export default function SeongmyungApp() {
     if (step !== 2) return;
     loadHanjaIndex()
       .then(() => setHanjaIndexReady(true))
-      .catch(() => setError("문양 데이터를 불러오지 못했습니다. 의식을 재시작해 주세요."));
+      .catch(() => setError("한자 데이터를 불러오지 못했습니다."));
   }, [step]);
 
   useEffect(() => {
@@ -91,6 +93,8 @@ export default function SeongmyungApp() {
   }, [step, hanjaIndexReady, name]);
 
   function handleHanjaSelect(index: number, selection: HanjaSelection) {
+    setInkPulse(true);
+    setTimeout(() => setInkPulse(false), 400);
     setHanjaSelections((prev) => {
       const next = [...prev];
       next[index] = selection;
@@ -106,7 +110,7 @@ export default function SeongmyungApp() {
       return;
     }
     if (!birthYear || !birthMonth || !birthDay) {
-      setError("천상의 기록(생년월일)을 모두 입력해 주세요.");
+      setError("생년월일을 모두 입력해 주세요.");
       return;
     }
     const y = Number(birthYear);
@@ -116,8 +120,8 @@ export default function SeongmyungApp() {
       setError("올바른 생년월일을 입력해 주세요.");
       return;
     }
-    if (!birthRegion) {
-      setError("대지의 좌표(태생지)를 선택해 주세요.");
+    if (birthHour !== "" && (Number(birthHour) < 0 || Number(birthHour) > 23)) {
+      setError("태어난 시는 0~23 사이로 입력해 주세요.");
       return;
     }
     goTo(2, 1);
@@ -126,34 +130,36 @@ export default function SeongmyungApp() {
   function handleAnalyze() {
     setError("");
     if (hanjaSelections.some((s) => !s)) {
-      setError("모든 글자에 한자를 동조해 주세요.");
+      setError("모든 글자에 한자를 선택해 주세요.");
       return;
     }
     try {
       const slots = hanjaSelections as HanjaSelection[];
-      const analyzed = analyzeSeongmyung({
-        name,
-        hanjaSlots: slots.map((s) => ({
-          hangul: s.hangul,
-          hanja: s.hanja,
-          meaning: s.meaning,
-          oheng: s.oheng,
-          wonStrokes: s.wonStrokes,
-        })),
-        birth: buildBirthProfile({
-          birthYear,
-          birthMonth,
-          birthDay,
-          birthRegion,
-          gender,
-          calendarType,
-          isLeapMonth,
+      setResult(
+        analyzeSeongmyung({
+          name,
+          hanjaSlots: slots.map((s) => ({
+            hangul: s.hangul,
+            hanja: s.hanja,
+            meaning: s.meaning,
+            oheng: s.oheng,
+            wonStrokes: s.wonStrokes,
+          })),
+          birth: buildBirthProfile({
+            birthYear,
+            birthMonth,
+            birthDay,
+            birthHour,
+            birthMinute,
+            gender,
+            calendarType,
+            isLeapMonth,
+          }),
         }),
-      });
-      setResult(analyzed);
+      );
       goTo("loading", 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "해독 중 오류가 발생했습니다.");
+      setError(err instanceof Error ? err.message : "분석 중 오류가 발생했습니다.");
     }
   }
 
@@ -168,28 +174,36 @@ export default function SeongmyungApp() {
     setBirthYear("");
     setBirthMonth("");
     setBirthDay("");
-    setBirthRegion("");
+    setBirthHour("");
+    setBirthMinute("");
     setHanjaSelections([]);
     setError("");
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-5 pb-24 pt-6">
+    <div className={`mx-auto max-w-2xl px-5 pb-24 pt-6 ${inkPulse ? "mk-ink-pulse" : ""}`}>
       {step !== "result" && step !== "intro" && step !== "loading" && (
         <div className="mb-8 flex items-center justify-center gap-3">
-          {[1, 2].map((s) => (
-            <div key={s} className="flex items-center gap-3">
+          {[
+            { id: 1, label: "生", sub: "천기" },
+            { id: 2, label: "字", sub: "보완" },
+          ].map((s, i) => (
+            <div key={s.id} className="flex items-center gap-3">
               <span
-                className={`flex h-8 w-8 items-center justify-center text-sm font-semibold ${
-                  step === s ? "oc-step oc-step-active" : step > s ? "oc-step oc-step-done" : "oc-step oc-step-idle"
+                className={`flex h-8 w-8 items-center justify-center font-musok text-sm ${
+                  step === s.id
+                    ? "mk-step mk-step-active"
+                    : step > s.id
+                      ? "mk-step mk-step-done"
+                      : "mk-step mk-step-idle"
                 }`}
               >
-                {s === 1 ? "生" : "字"}
+                {s.label}
               </span>
-              <span className={`text-xs tracking-wider ${step === s ? "text-red-200/80" : "text-white/25"}`}>
-                {s === 1 ? "태생" : "동조"}
+              <span className={`text-xs ${step === s.id ? "text-[var(--mk-ivory-dim)]" : "text-[var(--mk-ivory-muted)]"}`}>
+                {s.sub}
               </span>
-              {s === 1 && <span className="h-px w-8 bg-red-950/50" />}
+              {i === 0 && <span className="h-px w-8 bg-[var(--mk-border)]" />}
             </div>
           ))}
         </div>
@@ -198,7 +212,7 @@ export default function SeongmyungApp() {
       <AnimatePresence mode="wait" custom={direction}>
         {step === "intro" && (
           <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <IntroRitual onEnter={() => goTo(1, 1)} />
+            <IntroMusok onEnter={() => goTo(1, 1)} />
           </motion.div>
         )}
 
@@ -212,7 +226,8 @@ export default function SeongmyungApp() {
               birthYear={birthYear}
               birthMonth={birthMonth}
               birthDay={birthDay}
-              birthRegion={birthRegion}
+              birthHour={birthHour}
+              birthMinute={birthMinute}
               isComposing={isComposing}
               error={error}
               onNameChange={handleNameChange}
@@ -227,7 +242,8 @@ export default function SeongmyungApp() {
               setBirthYear={setBirthYear}
               setBirthMonth={setBirthMonth}
               setBirthDay={setBirthDay}
-              setBirthRegion={setBirthRegion}
+              setBirthHour={setBirthHour}
+              setBirthMinute={setBirthMinute}
               onSubmit={goStep2}
             />
           </motion.div>
@@ -236,9 +252,9 @@ export default function SeongmyungApp() {
         {step === 2 && (
           <motion.div key="step2" custom={direction} variants={slide} initial="initial" animate="animate" exit="exit" transition={slide.transition} className="space-y-5">
             <div className="text-center">
-              <p className="oc-kicker">Step II · 字</p>
-              <p className="font-occult mt-2 text-xl text-red-100/90">「{name}」의 영적 주파수 동조</p>
-              <p className="mt-2 text-xs text-white/30">각 한자의 원소 기호를 선택하여 문양을 완성하십시오</p>
+              <p className="mk-kicker">명줄 보완 (補完)</p>
+              <p className="font-musok mt-2 text-xl text-[var(--mk-ivory)]">「{name}」 한자 · 원획 · 오행</p>
+              <p className="mt-2 text-xs text-[var(--mk-ivory-muted)]">원획법(原劃法) 획수와 토속 오행 기운을 확인하십시오</p>
             </div>
 
             {chars.map((ch, i) => (
@@ -248,18 +264,18 @@ export default function SeongmyungApp() {
                 index={i}
                 selected={hanjaSelections[i] ?? null}
                 onSelect={handleHanjaSelect}
-                variant="occult"
+                variant="musok"
               />
             ))}
 
-            {error && <p className="text-center text-sm text-red-400">{error}</p>}
+            {error && <p className="text-center text-sm text-[var(--mk-cinnabar-soft)]">{error}</p>}
 
             <div className="flex gap-3">
-              <button type="button" onClick={() => goTo(1, -1)} className="oc-btn oc-btn-ghost flex-1">
+              <button type="button" onClick={() => goTo(1, -1)} className="mk-btn mk-btn-ghost flex-1">
                 이전
               </button>
-              <button type="button" onClick={handleAnalyze} className="oc-btn oc-btn-primary flex-[2]">
-                봉인 해제 · 해독
+              <button type="button" onClick={handleAnalyze} className="mk-btn mk-btn-primary flex-[2]">
+                신수 명통 열기
               </button>
             </div>
           </motion.div>
@@ -267,13 +283,13 @@ export default function SeongmyungApp() {
 
         {step === "loading" && result && (
           <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <OracleLoader onComplete={() => goTo("result", 1)} />
+            <MusokLoader onComplete={() => goTo("result", 1)} />
           </motion.div>
         )}
 
         {step === "result" && result && (
           <motion.div key="result" custom={direction} variants={slide} initial="initial" animate="animate" exit="exit" transition={slide.transition}>
-            <OccultDashboard result={result} onReset={reset} />
+            <MusokDashboard result={result} onReset={reset} />
           </motion.div>
         )}
       </AnimatePresence>

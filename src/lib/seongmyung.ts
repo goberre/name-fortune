@@ -486,7 +486,9 @@ export function analyzeSeongmyung(input: AnalyzeInput): SeongmyungResult {
   if (input.birth) {
     sajuProfile = analyzeSajuOheng(input.birth);
     sourceOhengHarmony = analyzeSourceOhengHarmony(sajuProfile, sourceOheng);
-    birthRegionAnalysis = analyzeBirthRegionHarmony(input.birth.birthRegion, sajuProfile, sourceOheng);
+    birthRegionAnalysis = input.birth.birthRegion
+      ? analyzeBirthRegionHarmony(input.birth.birthRegion, sajuProfile, sourceOheng)
+      : undefined;
     futureFortune = buildFutureFortune(input.birth, sagyeok);
     birthOheng = sajuProfile.dayOheng;
     birthSummary = sajuProfile.summary;

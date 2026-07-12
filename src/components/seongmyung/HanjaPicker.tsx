@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
-import OhengRune from "@/components/occult/OhengRune";
 import { getHanjaCandidates, isPopularHanja, type HanjaCandidate, type HanjaSelection } from "@/lib/hanja";
+import { OHENG_OBANG } from "@/lib/musok-copy";
 import { type Oheng } from "@/lib/seongmyung";
 
 const OHENG_STYLE: Record<Oheng, string> = {
@@ -14,22 +14,35 @@ const OHENG_STYLE: Record<Oheng, string> = {
   수: "bg-sky-50 text-sky-700 ring-sky-200",
 };
 
+function OhengMusokBadge({ oheng }: { oheng: Oheng }) {
+  const ob = OHENG_OBANG[oheng];
+  return (
+    <span
+      className="inline-flex flex-col items-center px-2 py-1 text-[10px] font-medium"
+      style={{ color: ob.color, border: `1px solid ${ob.color}44` }}
+    >
+      <span>{ob.label}</span>
+      <span>{oheng}</span>
+    </span>
+  );
+}
+
 type Props = {
   hangul: string;
   index: number;
   selected: HanjaSelection | null;
   onSelect: (index: number, selection: HanjaSelection) => void;
-  variant?: "light" | "occult";
+  variant?: "light" | "musok";
 };
 
-export default function HanjaPicker({ hangul, index, selected, onSelect, variant = "occult" }: Props) {
+export default function HanjaPicker({ hangul, index, selected, onSelect, variant = "musok" }: Props) {
   const [candidates, setCandidates] = useState<HanjaCandidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(false);
   const [pulseKey, setPulseKey] = useState<string | null>(null);
-  const occult = variant === "occult";
+  const musok = variant === "musok";
 
   useEffect(() => {
     let cancelled = false;
@@ -65,34 +78,34 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
   function pick(c: HanjaCandidate) {
     setPulseKey(c.hanja);
     onSelect(index, { hangul, ...c });
-    setTimeout(() => setPulseKey(null), 600);
+    setTimeout(() => setPulseKey(null), 500);
   }
 
-  const cardCls = occult ? "oc-card p-5" : "ap-card p-5";
+  const cardCls = musok ? "mk-card p-5" : "ap-card p-5";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06 }}
+      transition={{ delay: index * 0.05 }}
       className={cardCls}
     >
       <div className="mb-4 flex items-center gap-3">
         <span
           className={`flex h-12 w-12 items-center justify-center text-xl font-semibold ${
-            occult
-              ? "border border-red-900/50 bg-black/60 font-occult text-red-100"
+            musok
+              ? "border border-[var(--mk-border)] bg-[var(--mk-charcoal-light)] font-musok text-[var(--mk-ivory)]"
               : "rounded-2xl bg-neutral-100 text-neutral-900"
           }`}
         >
           {hangul}
         </span>
         <div className="flex-1">
-          <p className={`text-sm font-medium ${occult ? "text-red-100" : "text-neutral-900"}`}>
-            {occult ? "영적 주파수 동조" : "한자 선택"}
+          <p className={`text-sm font-medium ${musok ? "text-[var(--mk-ivory)]" : "text-neutral-900"}`}>
+            {musok ? "한자 · 원획 · 오행" : "한자 선택"}
           </p>
-          <p className={`text-xs ${occult ? "text-white/35" : "text-neutral-500"}`}>
-            {loading ? "문양 데이터 수신 중…" : `${candidates.length}개 후보 · 인기 한자 우선`}
+          <p className={`text-xs ${musok ? "text-[var(--mk-ivory-muted)]" : "text-neutral-500"}`}>
+            {loading ? "불러오는 중…" : `${candidates.length}개 · 인기 한자 우선 · 원획법`}
           </p>
         </div>
       </div>
@@ -103,26 +116,19 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="한자 · 뜻 검색"
-          className={occult ? "oc-input mb-3 px-4 py-2.5 text-sm" : "ap-input mb-3 px-4 py-2.5 text-sm"}
+          className={musok ? "mk-input mb-3 px-4 py-2.5 text-sm" : "ap-input mb-3 px-4 py-2.5 text-sm"}
         />
       )}
 
       {loading && (
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className={`h-14 animate-pulse ${occult ? "bg-red-950/30" : "rounded-xl bg-neutral-100"}`}
-            />
+            <div key={i} className={`h-14 animate-pulse ${musok ? "bg-[var(--mk-charcoal-light)]" : "rounded-xl bg-neutral-100"}`} />
           ))}
         </div>
       )}
 
-      {error && !loading && (
-        <p className={`px-4 py-3 text-sm ${occult ? "text-red-300/60" : "rounded-xl bg-neutral-50 text-neutral-500"}`}>
-          {error}
-        </p>
-      )}
+      {error && !loading && <p className="text-sm text-[var(--mk-cinnabar-soft)]">{error}</p>}
 
       {!loading && !error && (
         <>
@@ -136,48 +142,46 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
                   key={c.hanja}
                   type="button"
                   onClick={() => pick(c)}
-                  animate={pulsing ? { scale: [1, 1.02, 1], boxShadow: ["0 0 0 rgba(220,38,38,0)", "0 0 24px rgba(220,38,38,0.5)", "0 0 0 rgba(220,38,38,0)"] } : {}}
-                  transition={{ duration: 0.5 }}
+                  animate={pulsing && musok ? { scale: [1, 1.01, 1] } : {}}
+                  transition={{ duration: 0.35 }}
                   className={
-                    occult
+                    musok
                       ? `flex w-full items-center justify-between border px-4 py-3 text-left transition ${
                           active
-                            ? "border-red-500/60 bg-red-950/50 shadow-[0_0_20px_rgba(127,29,29,0.35)]"
-                            : "border-red-900/25 bg-black/30 hover:border-red-800/50 hover:bg-black/50"
-                        }`
+                            ? "border-[var(--mk-cinnabar)] bg-[var(--mk-ivory)]/5"
+                            : "border-[var(--mk-border)] bg-[var(--mk-charcoal-light)] hover:border-[var(--mk-cinnabar)]/40"
+                        } ${pulsing ? "mk-ink-flash" : ""}`
                       : `flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
                           active
-                            ? "border-neutral-900 bg-neutral-900 text-white shadow-sm"
-                            : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50"
+                            ? "border-neutral-900 bg-neutral-900 text-white"
+                            : "border-neutral-200 bg-white hover:bg-neutral-50"
                         }`
                   }
                 >
                   <div className="flex items-center gap-3">
-                    <span
-                      className={`text-2xl font-serif ${active ? (occult ? "text-red-100" : "text-white") : occult ? "text-white" : "text-neutral-900"}`}
-                    >
+                    <span className={`text-2xl font-serif ${musok ? "text-[var(--mk-ivory)]" : active ? "text-white" : "text-neutral-900"}`}>
                       {c.hanja}
                     </span>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className={`text-sm font-medium ${active ? (occult ? "text-red-100" : "text-white") : occult ? "text-white/90" : "text-neutral-900"}`}>
+                        <p className={`text-sm font-medium ${musok ? "text-[var(--mk-ivory-dim)]" : active ? "text-white" : "text-neutral-900"}`}>
                           {c.meaning}
                         </p>
                         {popular && (
-                          <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${occult ? "bg-red-800/60 text-red-200" : "bg-neutral-900 text-white"}`}>
+                          <span className={`text-[10px] ${musok ? "text-[var(--mk-obang)]" : "text-white bg-neutral-900 px-1.5 rounded-full"}`}>
                             인기
                           </span>
                         )}
                       </div>
-                      <p className={`text-xs ${active ? (occult ? "text-red-200/50" : "text-neutral-300") : "text-white/35"}`}>
-                        원획 {c.wonStrokes} · 영적 획수
+                      <p className={`text-xs ${musok ? "text-[var(--mk-ivory-muted)]" : "text-neutral-500"}`}>
+                        원획 {c.wonStrokes}획
                       </p>
                     </div>
                   </div>
-                  {occult ? (
-                    <OhengRune oheng={c.oheng} size="sm" />
+                  {musok ? (
+                    <OhengMusokBadge oheng={c.oheng} />
                   ) : (
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${active ? "bg-white/15 text-white ring-white/20" : OHENG_STYLE[c.oheng]}`}>
+                    <span className={`rounded-full px-2.5 py-1 text-xs ring-1 ${active ? "bg-white/15 text-white" : OHENG_STYLE[c.oheng]}`}>
                       {c.oheng}행
                     </span>
                   )}
@@ -187,20 +191,12 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
           </div>
 
           {hasMore && !expanded && (
-            <button
-              type="button"
-              onClick={() => setExpanded(true)}
-              className={`mt-3 w-full py-2 text-sm ${occult ? "oc-btn oc-btn-ghost" : "font-medium text-neutral-500 hover:text-neutral-900"}`}
-            >
+            <button type="button" onClick={() => setExpanded(true)} className={`mt-3 w-full py-2 text-sm ${musok ? "mk-btn mk-btn-ghost" : "text-neutral-500"}`}>
               {filtered.length - 8}개 더 보기
             </button>
           )}
           {expanded && hasMore && (
-            <button
-              type="button"
-              onClick={() => setExpanded(false)}
-              className={`mt-3 w-full py-2 text-sm ${occult ? "oc-btn oc-btn-ghost" : "font-medium text-neutral-500 hover:text-neutral-900"}`}
-            >
+            <button type="button" onClick={() => setExpanded(false)} className={`mt-3 w-full py-2 text-sm ${musok ? "mk-btn mk-btn-ghost" : "text-neutral-500"}`}>
               접기
             </button>
           )}
@@ -212,11 +208,7 @@ export default function HanjaPicker({ hangul, index, selected, onSelect, variant
 
 export function OhengBadge({ oheng, large }: { oheng: Oheng; large?: boolean }) {
   return (
-    <span
-      className={`inline-flex items-center rounded-full font-medium ring-1 ${OHENG_STYLE[oheng]} ${
-        large ? "px-3 py-1.5 text-sm" : "px-2 py-0.5 text-xs"
-      }`}
-    >
+    <span className={`inline-flex items-center rounded-full font-medium ring-1 ${OHENG_STYLE[oheng]} ${large ? "px-3 py-1.5 text-sm" : "px-2 py-0.5 text-xs"}`}>
       {oheng}행
     </span>
   );

@@ -1,24 +1,200 @@
 @import "tailwindcss";
 
+:root {
+  --mk-charcoal: #0b0b0c;
+  --mk-charcoal-light: #141416;
+  --mk-ivory: #f5f0e8;
+  --mk-ivory-dim: #c9c0b4;
+  --mk-ivory-muted: #8a8278;
+  --mk-cinnabar: #8b2500;
+  --mk-cinnabar-soft: #b84a32;
+  --mk-obang: #a67c00;
+  --mk-border: rgba(245, 240, 232, 0.12);
+}
+
 body {
   font-family:
     "Pretendard Variable",
     Pretendard,
+    "Apple SD Gothic Neo",
     -apple-system,
-    BlinkMacSystemFont,
     sans-serif;
-  background: #09090b;
-  color: #fafafa;
+  background: var(--mk-charcoal);
+  color: var(--mk-ivory);
   -webkit-font-smoothing: antialiased;
 }
 
-.font-occult {
-  font-family: "Cormorant Garamond", "Noto Serif KR", Georgia, serif;
+.font-musok,
+.mk-body .font-musok {
+  font-family: "Noto Serif KR", "Batang", "Apple SD Gothic Neo", serif;
 }
 
-/* ═══════════════════════════════════════════
-   Dark Occult Edition
-   ═══════════════════════════════════════════ */
+/* ═══ 한국 전통 무속 미니멀 ═══ */
+.mk-body {
+  background: var(--mk-charcoal);
+  color: var(--mk-ivory);
+  min-height: 100vh;
+}
+
+.mk-hanji-texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.mk-munjang {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image:
+    linear-gradient(var(--mk-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--mk-border) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.mk-ink-bleed {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(139, 37, 0, 0.06) 0%, transparent 60%);
+  animation: mk-ink-drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes mk-ink-drift {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+.mk-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--mk-cinnabar-soft);
+}
+
+.mk-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--mk-ivory-dim);
+}
+
+.mk-card {
+  border: 1px solid var(--mk-border);
+  background: var(--mk-charcoal-light);
+}
+
+.mk-card-elevated {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.mk-card-hyung {
+  border-color: rgba(139, 37, 0, 0.45);
+}
+
+.mk-card-current {
+  border-color: rgba(166, 124, 0, 0.4);
+}
+
+.mk-hanji {
+  background: linear-gradient(180deg, rgba(245, 240, 232, 0.03) 0%, transparent 100%);
+}
+
+.mk-input {
+  width: 100%;
+  border: 1px solid var(--mk-border);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--mk-ivory);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.mk-input::placeholder { color: var(--mk-ivory-muted); }
+.mk-input:focus {
+  border-color: rgba(139, 37, 0, 0.5);
+  box-shadow: 0 0 0 1px rgba(139, 37, 0, 0.2);
+}
+
+.mk-btn {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: opacity 0.15s;
+}
+.mk-btn-primary {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: var(--mk-cinnabar);
+  color: var(--mk-ivory);
+}
+.mk-btn-primary:hover:not(:disabled) { opacity: 0.9; }
+.mk-btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.mk-btn-ghost {
+  padding: 1rem;
+  border: 1px solid var(--mk-border);
+  background: transparent;
+  color: var(--mk-ivory-dim);
+}
+.mk-btn-ghost:hover { background: rgba(245, 240, 232, 0.04); }
+
+.mk-tag {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--mk-border);
+  color: var(--mk-ivory-muted);
+}
+.mk-tag-gil {
+  border-color: rgba(139, 37, 0, 0.4);
+  color: var(--mk-cinnabar-soft);
+}
+
+.mk-step {
+  border: 1px solid var(--mk-border);
+}
+.mk-step-active {
+  background: rgba(139, 37, 0, 0.25);
+  color: var(--mk-ivory);
+  border-color: rgba(139, 37, 0, 0.5);
+}
+.mk-step-done { color: var(--mk-ivory-dim); }
+.mk-step-idle { color: var(--mk-ivory-muted); opacity: 0.5; }
+
+.mk-shake {
+  animation: mk-shake 0.15s ease-in-out;
+}
+@keyframes mk-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+.mk-ink-pulse .mk-card {
+  animation: mk-ink-pulse 0.4s ease-out;
+}
+@keyframes mk-ink-pulse {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.08); }
+  100% { filter: brightness(1); }
+}
+
+.mk-ink-flash {
+  animation: mk-ink-flash 0.4s ease-out;
+}
+@keyframes mk-ink-flash {
+  0% { background-color: rgba(139, 37, 0, 0.15); }
+  100% { background-color: transparent; }
+}
+
+.mk-loader { color: var(--mk-ivory-dim); }
+
+.font-occult {
+  font-family: "Noto Serif KR", Georgia, serif;
+}
+
+/* legacy occult / apple — below */
 .oc-body {
   background: #09090b;
   color: #fafafa;

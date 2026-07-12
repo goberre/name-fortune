@@ -5,7 +5,9 @@ export type BirthProfile = {
   year: number;
   month: number;
   day: number;
-  birthRegion: string;
+  hour?: number;
+  minute?: number;
+  birthRegion?: string;
   gender: Gender;
   calendarType: CalendarType;
   isLeapMonth: boolean;
