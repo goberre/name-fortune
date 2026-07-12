@@ -187,7 +187,7 @@ body {
   width: 200%;
   height: 35%;
   filter: blur(32px);
-  opacity: 0.5;
+  opacity: 0.28;
 }
 .myst-fog-1 {
   top: 15%;
@@ -238,40 +238,124 @@ body {
 .folklore-layer {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 4;
   overflow: hidden;
   pointer-events: none;
 }
 
 .spirit-svg {
-  height: 7rem;
-  width: 5rem;
-  opacity: 0.55;
+  display: block;
+  height: 10rem;
+  width: 8rem;
 }
 
 .spirit-svg-sm {
-  height: 6rem;
-  width: 4rem;
-  opacity: 0.48;
+  height: 8.5rem;
+  width: 6.5rem;
 }
 
 .baekho-svg {
-  height: 5.5rem;
-  width: 14rem;
-  opacity: 0.52;
+  height: 7rem;
+  width: 16rem;
 }
 
 @media (min-width: 640px) {
   .spirit-svg {
-    height: 9rem;
-    width: 6.5rem;
-    opacity: 0.62;
+    height: 13rem;
+    width: 10.5rem;
+  }
+  .spirit-svg-sm {
+    height: 11rem;
+    width: 8.5rem;
   }
   .baekho-svg {
-    height: 7rem;
-    width: 18rem;
-    opacity: 0.58;
+    height: 9rem;
+    width: 21rem;
   }
+}
+
+.spirit-label {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dok-label {
+  color: rgba(134, 239, 172, 0.75);
+  text-shadow: 0 0 12px rgba(74, 222, 128, 0.5);
+}
+
+.dok-body {
+  fill: #4ade80;
+  stroke: #14532d;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.dok-body-alt {
+  fill: #6ee7b7;
+}
+
+.dok-eye {
+  fill: #fef08a;
+  stroke: #052e16;
+  stroke-width: 1.5;
+}
+
+.dok-mouth {
+  fill: none;
+  stroke: #052e16;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.tiger-body {
+  fill: #f1f5f9;
+  stroke: #334155;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.tiger-stripe {
+  fill: none;
+  stroke: #1e293b;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.tiger-eye {
+  fill: #fef08a;
+  stroke: #0f172a;
+  stroke-width: 1.5;
+}
+
+.tiger-nose {
+  fill: #fda4af;
+  stroke: none;
+}
+
+.tiger-ear {
+  fill: #f1f5f9;
+  stroke: #334155;
+  stroke-width: 2;
+}
+
+.tiger-whisker {
+  fill: none;
+  stroke: rgba(226, 232, 240, 0.55);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.tiger-leg,
+.tiger-tail {
+  fill: #f1f5f9;
+  stroke: #334155;
+  stroke-width: 2;
 }
 
 .dok-fire {
@@ -290,37 +374,38 @@ body {
 
 .dok-spirit {
   position: absolute;
-  bottom: 28%;
-  z-index: 3;
-  filter: drop-shadow(0 0 12px rgba(134, 239, 172, 0.6));
+  bottom: 22%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 0 18px rgba(74, 222, 128, 0.75));
 }
 
 .dok-spirit-1 {
-  animation: nf-dok-pass 9s linear infinite;
+  animation: nf-dok-pass 7s linear infinite;
 }
 
 .dok-spirit-2 {
-  bottom: 48%;
-  animation: nf-dok-pass-rev 9s linear infinite 2s;
+  bottom: 52%;
+  animation: nf-dok-pass-rev 7s linear infinite 1.5s;
 }
 
 .baekho-spirit {
   position: absolute;
-  top: 38%;
+  top: 32%;
   left: 0;
-  z-index: 3;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: nf-baekho 11s linear infinite 0.8s;
-  filter: drop-shadow(0 0 16px rgba(226, 232, 240, 0.4));
+  animation: nf-baekho 8s linear infinite 0.6s;
+  filter: drop-shadow(0 0 20px rgba(241, 245, 249, 0.45));
 }
 
 .baekho-label {
-  margin-top: 0.25rem;
-  font-size: 0.625rem;
-  letter-spacing: 0.35em;
-  color: rgba(226, 232, 240, 0.35);
+  color: rgba(241, 245, 249, 0.8);
+  text-shadow: 0 0 14px rgba(226, 232, 240, 0.45);
 }
 @keyframes nf-drift {
   0%,
@@ -339,27 +424,27 @@ body {
 }
 @keyframes nf-dok-pass {
   0% {
-    transform: translateX(-120px);
+    transform: translateX(-140px);
     opacity: 0;
   }
-  3% {
-    opacity: 0.85;
+  4% {
+    opacity: 1;
   }
-  97% {
-    opacity: 0.7;
+  96% {
+    opacity: 0.92;
   }
   100% {
-    transform: translateX(calc(100vw + 120px));
+    transform: translateX(calc(100vw + 140px));
     opacity: 0;
   }
 }
 @keyframes nf-dok-pass-rev {
   0% {
-    transform: translateX(calc(100vw + 100px)) scaleX(-1);
+    transform: translateX(calc(100vw + 120px)) scaleX(-1);
     opacity: 0;
   }
-  3% {
-    opacity: 0.75;
+  4% {
+    opacity: 0.95;
   }
   100% {
     transform: translateX(-120px) scaleX(-1);
@@ -368,17 +453,17 @@ body {
 }
 @keyframes nf-baekho {
   0% {
-    transform: translateX(-25vw);
+    transform: translateX(-30vw);
     opacity: 0;
   }
-  4% {
+  5% {
+    opacity: 1;
+  }
+  95% {
     opacity: 0.9;
   }
-  96% {
-    opacity: 0.65;
-  }
   100% {
-    transform: translateX(105vw);
+    transform: translateX(110vw);
     opacity: 0;
   }
 }
