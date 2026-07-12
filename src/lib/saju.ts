@@ -1,5 +1,4 @@
 import type { Oheng } from "@/lib/seongmyung";
-import { OHENG_LABEL } from "@/lib/seongmyung";
 
 const STEM_OHENG: Oheng[] = ["목", "목", "화", "화", "토", "토", "금", "금", "수", "수"];
 
@@ -58,7 +57,7 @@ export function analyzeSajuOheng(birth: BirthDate): SajuOhengProfile {
 
   const summary =
     lacking.length > 0
-      ? `사주에 ${lacking.map((o) => `${o}(${OHENG_LABEL[o]})`).join(", ")} 기운이 부족합니다. 이름 한자의 자원오행으로 보완 여부를 확인하세요.`
+      ? `사주에 ${lacking.map((o) => `${o}행`).join(", ")} 기운이 부족합니다. 이름 한자의 자원오행으로 보완 여부를 확인해 주세요.`
       : "사주에 오행이 고르게 분포되어 있습니다. 이름 한자와의 조화를 확인하세요.";
 
   return { yearOheng, monthOheng, dayOheng, distribution, lacking, summary };
@@ -82,7 +81,7 @@ export function analyzeSourceOhengHarmony(
 
   if (fillsLacking.length > 0) {
     gilHeung = "길";
-    summary = `이름 한자가 사주에 부족한 ${fillsLacking.map((o) => `${o}(${OHENG_LABEL[o]})`).join(", ")} 기운을 보완합니다. '이름대로 살아간다'는 성명학의 긍정적 해석입니다.`;
+    summary = `이름 한자가 사주에 부족한 ${fillsLacking.map((o) => `${o}행`).join(", ")} 기운을 보완합니다. 이름대로 살아간다는 성명학의 긍정적 해석입니다.`;
   } else if (saju.lacking.length > 0) {
     gilHeung = "흉";
     summary = `사주에 부족한 ${saju.lacking.map((o) => o).join(", ")} 기운을 이름 한자가 직접 보완하지 못합니다. 한자 선택을 재검토해 보세요.`;
@@ -92,7 +91,7 @@ export function analyzeSourceOhengHarmony(
   const main = saju.yearOheng;
   const generatesMain = nameOheng.some((o) => OHENG_GENERATES[o] === main);
   if (generatesMain && gilHeung !== "흉") {
-    summary += ` 또한 이름 오행이 ${main}(${OHENG_LABEL[main]}) 기운을 돕는 상생 관계입니다.`;
+    summary += ` 또한 이름 오행이 ${main}행 기운을 돕는 상생 관계입니다.`;
   }
 
   return { gilHeung, fillsLacking, nameOheng, summary };

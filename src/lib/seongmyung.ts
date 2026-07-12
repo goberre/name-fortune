@@ -119,11 +119,11 @@ const OHENG_OVERCOMES: Record<Oheng, Oheng> = {
 };
 
 const OHENG_LABEL: Record<Oheng, string> = {
-  목: "木",
-  화: "火",
-  토: "土",
-  금: "金",
-  수: "水",
+  목: "목",
+  화: "화",
+  토: "토",
+  금: "금",
+  수: "수",
 };
 
 /** 한글 → 초성 인덱스 */
@@ -261,10 +261,10 @@ export function analyzePronunciation(name: string): {
   let summary = "발음오행이 평온하게 이어집니다.";
   if (saeng > geuk) {
     gilHeung = "길";
-    summary = `발음오행이 상생(相生)으로 이어져 ${flow.map((o) => OHENG_LABEL[o]).join(" → ")} 흐름이 순조롭습니다.`;
+    summary = `발음오행이 상생으로 이어져 ${flow.map((o) => OHENG_LABEL[o]).join(" → ")} 흐름이 순조롭습니다.`;
   } else if (geuk > saeng) {
     gilHeung = "흉";
-    summary = "발음오행에 상극(相剋)이 있어 주변과의 조율·인내가 중요합니다.";
+    summary = "발음오행에 상극이 있어 주변과의 조율·인내가 중요합니다.";
   } else if (saeng > 0) {
     gilHeung = "길";
     summary = "발음오행에 상생 기운이 있어 협력과 성장에 유리합니다.";

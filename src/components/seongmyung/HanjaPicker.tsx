@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { getHanjaCandidates, type HanjaCandidate, type HanjaSelection } from "@/lib/hanja";
-import { OHENG_LABEL, type Oheng } from "@/lib/seongmyung";
+import { type Oheng } from "@/lib/seongmyung";
 
 const OHENG_STYLE: Record<Oheng, string> = {
   목: "bg-emerald-50 text-emerald-700 ring-emerald-200",
@@ -135,7 +135,7 @@ export default function HanjaPicker({ hangul, index, selected, onSelect }: Props
                       active ? "bg-white/15 text-white ring-white/20" : OHENG_STYLE[c.oheng]
                     }`}
                   >
-                    {OHENG_LABEL[c.oheng]} {c.oheng}
+                    {c.oheng}행
                   </span>
                 </button>
               );
@@ -174,7 +174,7 @@ export function OhengBadge({ oheng, large }: { oheng: Oheng; large?: boolean }) 
         large ? "px-3 py-1.5 text-sm" : "px-2 py-0.5 text-xs"
       }`}
     >
-      {OHENG_LABEL[oheng]} {oheng}
+      {oheng}행
     </span>
   );
 }
