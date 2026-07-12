@@ -16,10 +16,10 @@ import {
 const OHENG_LIST: Oheng[] = ["목", "화", "토", "금", "수"];
 
 const FORTUNE_LABEL: Record<FortuneGrade, string> = {
-  대길: "천명(天命) — 하늘이 돕는 이름",
-  길: "길운(吉運) — 순조로운 흐름",
-  보통: "평운(平運) — 스스로 개척",
-  주의: "⚠ 흉기(凶氣) — 주의가 필요한 이름",
+  대길: "천명 — 하늘이 돕는 이름",
+  길: "길운 — 순조로운 흐름",
+  보통: "평운 — 스스로 개척하는 이름",
+  주의: "⚠ 흉기 — 주의가 필요한 이름",
 };
 
 function OhengChart({ count }: { count: Record<Oheng, number> }) {
@@ -73,14 +73,14 @@ function ResultCard({ result }: { result: NameAnalysis }) {
             {result.grade}
           </span>
           <span className="text-xs text-white/40">성명수 {result.nameNumber}/81</span>
-          <span className="text-xs text-white/40">主氣 {result.dominant}</span>
+          <span className="text-xs text-white/40">주기운 {result.dominant}</span>
         </div>
         <p className="mt-3 text-xs text-red-300/60">{FORTUNE_LABEL[result.grade]}</p>
         <p className="mt-4 text-sm leading-relaxed text-white/60">{result.summary}</p>
       </div>
 
       <div className="myst-card myst-tarot rounded-none p-5" style={{ animationDelay: "0.1s" }}>
-        <h3 className="font-occult text-xs tracking-[0.2em] text-red-300/70">◈ 글자별 五行</h3>
+        <h3 className="text-xs tracking-wider text-red-300/70">◈ 글자별 오행</h3>
         <div className="mt-4 flex flex-wrap justify-center gap-3">
           {result.syllables.map((s) => (
             <div
@@ -97,23 +97,23 @@ function ResultCard({ result }: { result: NameAnalysis }) {
       </div>
 
       <div className="myst-card myst-tarot rounded-none p-5" style={{ animationDelay: "0.2s" }}>
-        <h3 className="font-occult text-xs tracking-[0.2em] text-red-300/70">◈ 五行 均衡</h3>
+        <h3 className="text-xs tracking-wider text-red-300/70">◈ 오행 균형</h3>
         <OhengChart count={result.ohengCount} />
         {result.lacking.length > 0 && (
           <p className="mt-4 text-center text-xs text-red-400/80">
-            ⚠ 欠けた氣: {result.lacking.join(" · ")} — 균형이 무너져 있습니다
+            ⚠ 부족한 기운: {result.lacking.join(" · ")} — 균형이 무너져 있습니다
           </p>
         )}
       </div>
 
       {(
         [
-          ["性質", result.personality, "0.3s"],
-          ["職業", result.career, "0.4s"],
-          ["因緣", result.love, "0.5s"],
-          ["財運", result.wealth, "0.6s"],
-          ["健康", result.health, "0.7s"],
-          ["忠告", result.advice, "0.8s"],
+          ["성격", result.personality, "0.3s"],
+          ["직업·진로", result.career, "0.4s"],
+          ["연애·인연", result.love, "0.5s"],
+          ["재물·금전", result.wealth, "0.6s"],
+          ["건강", result.health, "0.7s"],
+          ["조언", result.advice, "0.8s"],
         ] as const
       ).map(([title, body, delay]) => (
         <div
@@ -121,13 +121,13 @@ function ResultCard({ result }: { result: NameAnalysis }) {
           className="myst-card myst-tarot rounded-none p-5"
           style={{ animationDelay: delay }}
         >
-          <h3 className="font-occult text-xs tracking-[0.25em] text-red-300/60">◈ {title}</h3>
+          <h3 className="text-xs tracking-wider text-red-300/60">◈ {title}</h3>
           <p className="mt-3 text-sm leading-relaxed text-white/55">{body}</p>
         </div>
       ))}
 
       <p className="text-center text-[10px] tracking-wider text-red-900/70">
-        此 解 釋 僅 供 參 考 · 命 運 是 自 己 開 拓 的
+        참고용 풀이입니다 · 운명은 스스로 개척합니다
       </p>
     </div>
   );
@@ -199,8 +199,8 @@ export default function NameFortuneApp() {
           <div className="myst-altar">
             <RitualCircle active={name.length > 0} />
             <div className="myst-input-wrap">
-              <label htmlFor="name" className="mb-4 block text-center text-xs tracking-[0.2em] text-red-300/50">
-                名을 새겨 넣으라
+              <label htmlFor="name" className="mb-4 block text-center text-sm text-red-300/60">
+                이름을 입력하세요
               </label>
               <input
                 id="name"
@@ -212,7 +212,7 @@ export default function NameFortuneApp() {
                   setIsComposing(false);
                   setName(sanitizeName(e.currentTarget.value));
                 }}
-                placeholder="···"
+                placeholder="홍길동"
                 maxLength={4}
                 autoComplete="off"
                 autoCapitalize="off"
@@ -221,7 +221,7 @@ export default function NameFortuneApp() {
                 lang="ko"
                 inputMode="text"
                 enterKeyHint="go"
-                className="myst-input font-occult w-full rounded-none px-4 py-6 text-center text-4xl font-bold tracking-[0.35em] text-red-100 placeholder:text-red-900/40 outline-none"
+                className="myst-input w-full rounded-none px-4 py-6 text-center text-4xl font-bold tracking-[0.2em] text-red-100 placeholder:text-red-900/40 outline-none"
               />
             </div>
           </div>
@@ -234,9 +234,9 @@ export default function NameFortuneApp() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="font-occult myst-btn mt-8 w-full py-5 text-sm font-bold text-red-100 transition disabled:cursor-not-allowed disabled:opacity-30"
+            className="myst-btn mt-8 w-full py-5 text-base font-bold text-red-100 transition disabled:cursor-not-allowed disabled:opacity-30"
           >
-            運命を解く
+            운명 풀어보기
           </button>
         </form>
       )}
@@ -250,9 +250,9 @@ export default function NameFortuneApp() {
               setResult(null);
               setName("");
             }}
-            className="font-occult mt-8 w-full border border-red-900/40 py-4 text-xs tracking-[0.2em] text-red-300/50 transition hover:border-red-700/50 hover:bg-red-950/20 hover:text-red-200/70"
+            className="mt-8 w-full border border-red-900/40 py-4 text-sm tracking-wide text-red-300/50 transition hover:border-red-700/50 hover:bg-red-950/20 hover:text-red-200/70"
           >
-            別の名を解く
+            다른 이름 풀기
           </button>
         </>
       )}

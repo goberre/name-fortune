@@ -48,9 +48,7 @@ body {
 }
 
 .myst-vignette-deep {
-  position: absolute;
-  inset: 0;
-  box-shadow: inset 0 0 120px 40px rgba(0, 0, 0, 0.85);
+  display: none;
 }
 
 /* ── Fog ── */
@@ -75,10 +73,7 @@ body {
 }
 
 .myst-fog-3 {
-  top: 45%;
-  height: 30%;
-  background: radial-gradient(ellipse at center, rgba(88, 28, 135, 0.12) 0, transparent 70%);
-  animation: myst-breathe 10s ease-in-out infinite;
+  display: none;
 }
 
 /* ── Candles ── */
@@ -131,44 +126,25 @@ body {
   box-shadow: 0 0 10px rgba(220, 38, 38, 0.9);
 }
 
+.myst-grain,
+.myst-scan,
 .myst-ash {
-  position: absolute;
-  top: -4px;
-  width: 1px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.3);
-  animation: ash-fall 12s linear infinite;
-}
-
-.myst-grain {
-  position: absolute;
-  inset: 0;
-  opacity: 0.07;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain-shift 0.5s steps(2) infinite;
-}
-
-.myst-scan {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0, 0, 0, 0.04) 3px,
-    rgba(0, 0, 0, 0.04) 6px
-  );
-  opacity: 0.5;
+  display: none;
 }
 
 /* ── 도깨비불 · 도깨비 · 백호 ── */
 .folklore-layer {
+  position: absolute;
+  inset: 0;
   z-index: 1;
+  contain: strict;
+  overflow: hidden;
 }
 
 .dok-fire {
   position: absolute;
-  animation: dok-fire-drift ease-in-out infinite;
+  animation: dok-fire-drift 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 .dok-fire-core {
@@ -178,161 +154,105 @@ body {
   background: radial-gradient(
     ellipse at 50% 70%,
     #ecfccb 0%,
-    #4ade80 25%,
-    #22d3ee 55%,
+    #4ade80 30%,
+    #22d3ee 60%,
     rgba(34, 211, 238, 0) 75%
   );
-  box-shadow:
-    0 0 12px rgba(74, 222, 128, 0.9),
-    0 0 28px rgba(34, 211, 238, 0.5),
-    0 0 48px rgba(74, 222, 128, 0.25);
-  animation: dok-fire-flicker 0.35s ease-in-out infinite alternate;
-}
-
-.dok-fire-tail {
-  position: absolute;
-  bottom: -30%;
-  left: 20%;
-  width: 60%;
-  height: 50%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(34, 211, 238, 0.35) 0%, transparent 70%);
-  filter: blur(3px);
-  animation: dok-fire-flicker 0.5s ease-in-out infinite alternate-reverse;
+  box-shadow: 0 0 16px rgba(74, 222, 128, 0.7);
+  animation: dok-fire-flicker 0.6s ease-in-out infinite alternate;
 }
 
 .dok-spirit {
   position: absolute;
-  bottom: 22%;
-  filter: blur(0.5px);
+  bottom: 24%;
+  will-change: transform, opacity;
 }
 
 .dok-spirit-1 {
-  animation: dok-pass-1 28s linear infinite;
+  animation: dok-pass 10s linear infinite;
 }
 
 .dok-spirit-2 {
-  bottom: 38%;
-  animation: dok-pass-2 36s linear infinite;
-  animation-delay: -14s;
+  bottom: 40%;
+  animation: dok-pass-reverse 10s linear infinite;
+  animation-delay: 2s;
 }
 
 .baekho-spirit {
   position: absolute;
-  top: 58%;
-  left: -30%;
-  filter: blur(1px);
-  animation: baekho-prowl 45s ease-in-out infinite;
-}
-
-.mountain-mist {
-  position: absolute;
-  width: 140%;
-  height: 25%;
-  filter: blur(40px);
-  opacity: 0.35;
-}
-
-.mountain-mist-1 {
-  bottom: 8%;
-  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.12), rgba(74, 222, 128, 0.06), transparent);
-  animation: myst-drift 40s ease-in-out infinite;
-}
-
-.mountain-mist-2 {
-  bottom: 18%;
-  background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.08), transparent);
-  animation: myst-drift 50s ease-in-out infinite reverse;
-  opacity: 0.25;
+  top: 55%;
+  left: 0;
+  will-change: transform, opacity;
+  animation: baekho-pass 12s linear infinite;
+  animation-delay: 1s;
 }
 
 @keyframes dok-fire-drift {
   0%,
   100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(8px, -14px) scale(1.08);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translate(-6px, -22px) scale(0.92);
-  }
-  75% {
-    transform: translate(10px, -10px) scale(1.05);
+    transform: translate3d(6px, -12px, 0);
   }
 }
 
 @keyframes dok-fire-flicker {
   0% {
-    opacity: 0.85;
-    transform: scale(1) rotate(-2deg);
+    opacity: 0.8;
   }
   100% {
     opacity: 1;
-    transform: scale(1.06) rotate(2deg);
   }
 }
 
-@keyframes dok-pass-1 {
+@keyframes dok-pass {
   0% {
-    transform: translateX(-120px) translateY(0);
+    transform: translate3d(-120px, 0, 0);
     opacity: 0;
   }
   5% {
-    opacity: 0.18;
+    opacity: 0.2;
   }
-  45% {
-    opacity: 0.14;
-  }
-  50% {
-    transform: translateX(calc(100vw + 120px)) translateY(-20px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(calc(100vw + 120px)) translateY(-20px);
-    opacity: 0;
-  }
-}
-
-@keyframes dok-pass-2 {
-  0% {
-    transform: translateX(calc(100vw + 100px)) scaleX(-1) translateY(0);
-    opacity: 0;
-  }
-  5% {
+  95% {
     opacity: 0.12;
   }
-  45% {
-    opacity: 0.1;
-  }
-  50% {
-    transform: translateX(-120px) scaleX(-1) translateY(15px);
-    opacity: 0;
-  }
   100% {
-    transform: translateX(-120px) scaleX(-1) translateY(15px);
+    transform: translate3d(calc(100vw + 120px), -12px, 0);
     opacity: 0;
   }
 }
 
-@keyframes baekho-prowl {
+@keyframes dok-pass-reverse {
   0% {
-    transform: translateX(0) translateY(0);
+    transform: translate3d(calc(100vw + 100px), 0, 0) scaleX(-1);
     opacity: 0;
   }
-  8% {
+  5% {
+    opacity: 0.15;
+  }
+  95% {
     opacity: 0.1;
   }
-  40% {
-    opacity: 0.08;
-    transform: translateX(55vw) translateY(-8px);
-  }
-  48% {
+  100% {
+    transform: translate3d(-120px, 10px, 0) scaleX(-1);
     opacity: 0;
-    transform: translateX(70vw) translateY(-5px);
+  }
+}
+
+@keyframes baekho-pass {
+  0% {
+    transform: translate3d(-25vw, 0, 0);
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.12;
+  }
+  94% {
+    opacity: 0.08;
   }
   100% {
-    transform: translateX(70vw) translateY(-5px);
+    transform: translate3d(110vw, -6px, 0);
     opacity: 0;
   }
 }
@@ -349,7 +269,7 @@ body {
 }
 
 .ritual-ring-svg {
-  animation: ring-spin 90s linear infinite;
+  animation: ring-spin 120s linear infinite;
 }
 
 .ritual-outer {
@@ -421,11 +341,8 @@ body {
 
 /* ── Hero & cards ── */
 .myst-title {
-  animation: title-flicker 6s ease-in-out infinite;
-  text-shadow:
-    0 0 10px rgba(220, 38, 38, 0.6),
-    0 0 30px rgba(127, 29, 29, 0.4),
-    0 0 60px rgba(88, 28, 135, 0.3);
+  animation: none;
+  text-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
 }
 
 .myst-subtitle {
@@ -485,12 +402,7 @@ body {
 }
 
 .myst-btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(248, 113, 113, 0.08), transparent);
-  transform: translateX(-100%);
-  animation: btn-sweep 3s ease-in-out infinite;
+  display: none;
 }
 
 .myst-btn:hover:not(:disabled) {
@@ -507,7 +419,7 @@ body {
 }
 
 .myst-card-glow {
-  animation: card-throb 3s ease-in-out infinite;
+  animation: none;
 }
 
 .myst-card-danger {

@@ -21,20 +21,21 @@ export default function RitualCircle({ active = false }: { active?: boolean }) {
           const a = (i * 30 * Math.PI) / 180;
           const x = 160 + Math.cos(a) * 128;
           const y = 160 + Math.sin(a) * 128;
+          const branches = ["자", "축", "인", "묘", "진", "사", "오", "미", "신", "유", "술", "해"];
           return (
             <g key={i} transform={`translate(${x}, ${y})`}>
               <circle r="3" className="ritual-node" />
               <text y="4" textAnchor="middle" className="ritual-rune fill-current text-[9px]">
-                {["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"][i]}
+                {branches[i]}
               </text>
             </g>
           );
         })}
         <text x="160" y="28" textAnchor="middle" className="ritual-caption fill-current text-[10px]">
-          名 · 命 · 運
+          이름 · 운명 · 기운
         </text>
         <text x="160" y="298" textAnchor="middle" className="ritual-caption fill-current text-[10px]">
-          陰陽五行
+          오행 순환
         </text>
       </svg>
     </div>
