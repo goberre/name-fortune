@@ -8,8 +8,143 @@ body {
     "Pretendard Variable",
     Pretendard,
     sans-serif;
-  background: #fff;
-  color: #111827;
+  background: #07040f;
+  color: #f5f3ff;
+}
+
+.nf-bg {
+  background-color: #07040f;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(109, 40, 217, 0.35) 0, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 100% 50%, rgba(220, 38, 38, 0.08) 0, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 0% 80%, rgba(52, 211, 153, 0.06) 0, transparent 45%);
+}
+
+.nf-card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: linear-gradient(160deg, rgba(15, 8, 30, 0.92) 0%, rgba(8, 6, 16, 0.88) 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+}
+
+.nf-card-highlight {
+  border-color: rgba(167, 139, 250, 0.35);
+  box-shadow:
+    0 0 40px rgba(109, 40, 217, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.nf-input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.nf-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.nf-input:focus {
+  border-color: rgba(167, 139, 250, 0.55);
+  box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.2);
+}
+
+.nf-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(196, 181, 253, 0.85);
+}
+
+.nf-btn {
+  width: 100%;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 50%, #312e81 100%);
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(109, 40, 217, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.nf-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 32px rgba(109, 40, 217, 0.5);
+  transform: translateY(-1px);
+}
+
+.nf-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.nf-btn-ghost {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: rgba(196, 181, 253, 0.7);
+  transition: background 0.2s;
+}
+
+.nf-btn-ghost:hover {
+  background: rgba(109, 40, 217, 0.12);
+  color: #e9d5ff;
+}
+
+.nf-badge-gil {
+  border-radius: 9999px;
+  background: rgba(52, 211, 153, 0.15);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6ee7b7;
+  ring: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.nf-badge-heung {
+  border-radius: 9999px;
+  background: rgba(248, 113, 113, 0.15);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #fca5a5;
+}
+
+.nf-badge-pyeong {
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.nf-stroke-btn {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.625rem;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 1.125rem;
+  color: #c4b5fd;
+  transition: background 0.15s;
+}
+
+.nf-stroke-btn:hover {
+  background: rgba(109, 40, 217, 0.25);
+}
+
+.nf-title-glow {
+  text-shadow: 0 0 40px rgba(167, 139, 250, 0.35);
 }
 
 .sr-only {
@@ -22,4 +157,179 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* ── 배경 (경량) ── */
+.myst-void {
+  position: absolute;
+  inset: 0;
+  background: #07040f;
+}
+.myst-blood-moon {
+  position: absolute;
+  top: 8%;
+  right: 10%;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fecaca, #991b1b 60%, transparent 70%);
+  opacity: 0.35;
+  box-shadow: 0 0 40px rgba(220, 38, 38, 0.25);
+}
+.myst-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.55) 100%);
+}
+.myst-fog {
+  position: absolute;
+  width: 200%;
+  height: 35%;
+  filter: blur(32px);
+  opacity: 0.5;
+}
+.myst-fog-1 {
+  top: 15%;
+  background: linear-gradient(90deg, transparent, rgba(109, 40, 217, 0.1), transparent);
+  animation: nf-drift 28s ease-in-out infinite;
+}
+.myst-fog-2 {
+  bottom: 20%;
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.05), transparent);
+  animation: nf-drift 34s ease-in-out infinite reverse;
+}
+.myst-candle {
+  position: absolute;
+  bottom: 14%;
+  width: 6px;
+  height: 36px;
+  background: #2a1810;
+  border-radius: 2px;
+}
+.myst-candle::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 10px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, #fde68a, #f97316, transparent);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+.myst-candle-l {
+  left: 10%;
+}
+.myst-candle-r {
+  right: 10%;
+}
+.myst-ember {
+  position: absolute;
+  bottom: 0;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #a78bfa;
+  box-shadow: 0 0 6px #a78bfa;
+  animation: nf-rise 9s linear infinite;
+}
+.folklore-layer {
+  position: absolute;
+  inset: 0;
+  contain: strict;
+  overflow: hidden;
+}
+.dok-fire {
+  position: absolute;
+  animation: nf-drift 7s ease-in-out infinite;
+}
+.dok-fire-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 50% 70%, #bbf7d0, #4ade80, #22d3ee, transparent);
+  box-shadow: 0 0 14px rgba(74, 222, 128, 0.6);
+}
+.dok-spirit {
+  position: absolute;
+  bottom: 22%;
+}
+.dok-spirit-1 {
+  animation: nf-dok-pass 10s linear infinite;
+}
+.dok-spirit-2 {
+  bottom: 36%;
+  animation: nf-dok-pass-rev 10s linear infinite 2s;
+}
+.baekho-spirit {
+  position: absolute;
+  top: 54%;
+  animation: nf-baekho 12s linear infinite 1s;
+}
+@keyframes nf-drift {
+  0%,
+  100% {
+    transform: translateX(-20%);
+  }
+  50% {
+    transform: translateX(5%);
+  }
+}
+@keyframes nf-rise {
+  to {
+    transform: translateY(-100vh);
+    opacity: 0;
+  }
+}
+@keyframes nf-dok-pass {
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.15;
+  }
+  95% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translateX(calc(100vw + 100px));
+    opacity: 0;
+  }
+}
+@keyframes nf-dok-pass-rev {
+  0% {
+    transform: translateX(calc(100vw + 80px)) scaleX(-1);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.12;
+  }
+  100% {
+    transform: translateX(-100px) scaleX(-1);
+    opacity: 0;
+  }
+}
+@keyframes nf-baekho {
+  0% {
+    transform: translateX(-20vw);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translateX(110vw);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .myst-fog,
+  .myst-ember,
+  .dok-fire,
+  .dok-spirit,
+  .baekho-spirit {
+    animation: none !important;
+  }
 }

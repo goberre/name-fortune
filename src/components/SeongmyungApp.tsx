@@ -55,13 +55,7 @@ export default function SeongmyungApp() {
         return;
       }
       const year = birthYear ? Number(birthYear) : undefined;
-      setResult(
-        analyzeSeongmyung({
-          name,
-          strokes,
-          birthYear: year,
-        }),
-      );
+      setResult(analyzeSeongmyung({ name, strokes, birthYear: year }));
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "분석 중 오류가 발생했습니다.");
@@ -69,19 +63,19 @@ export default function SeongmyungApp() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-5 pb-20 pt-6">
+    <div className="mx-auto max-w-2xl px-5 pb-20 pt-8">
       <AnimatePresence mode="wait">
         {!result ? (
           <motion.form
             key="form"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             onSubmit={handleSubmit}
-            className="space-y-8"
+            className="nf-card space-y-6 p-6 sm:p-8"
           >
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="nf-label">
                 한글 이름
               </label>
               <input
@@ -96,32 +90,27 @@ export default function SeongmyungApp() {
                 placeholder="홍길동"
                 maxLength={4}
                 lang="ko"
-                className="mt-2 w-full rounded-2xl border-0 bg-gray-50 px-5 py-4 text-2xl font-semibold tracking-widest text-gray-900 ring-1 ring-gray-200 outline-none transition focus:ring-2 focus:ring-gray-900"
+                className="nf-input mt-2 px-5 py-4 text-2xl font-semibold tracking-[0.2em]"
               />
-              <p className="mt-2 text-xs text-gray-400">2~4글자 · 성+이름</p>
+              <p className="mt-2 text-xs text-white/35">2~4글자 · 성+이름</p>
             </div>
 
             {chars.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                className="space-y-3"
-              >
-                <p className="text-sm font-medium text-gray-700">한자 획수 (글자별)</p>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+                <p className="nf-label">한자 획수 (글자별)</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {chars.map((ch, i) => (
-                    <div key={`${ch}-${i}`} className="flex items-center gap-3 rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-100">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-xl font-bold text-gray-900 ring-1 ring-gray-100">
+                    <div
+                      key={`${ch}-${i}`}
+                      className="flex items-center gap-3 rounded-xl border border-violet-500/15 bg-black/30 p-3"
+                    >
+                      <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-violet-950/50 text-xl font-bold text-violet-100">
                         {ch}
                       </span>
                       <div className="flex-1">
-                        <label className="text-xs text-gray-400">획수</label>
+                        <span className="text-xs text-white/35">획수</span>
                         <div className="mt-1 flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setStrokeAt(i, (strokes[i] ?? 8) - 1)}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-lg ring-1 ring-gray-200"
-                          >
+                          <button type="button" className="nf-stroke-btn" onClick={() => setStrokeAt(i, (strokes[i] ?? 8) - 1)}>
                             −
                           </button>
                           <input
@@ -130,13 +119,9 @@ export default function SeongmyungApp() {
                             max={99}
                             value={strokes[i] ?? estimateHangulStrokes(ch)}
                             onChange={(e) => setStrokeAt(i, Number(e.target.value) || 1)}
-                            className="w-14 rounded-lg bg-white py-2 text-center text-lg font-semibold ring-1 ring-gray-200 outline-none"
+                            className="nf-input w-14 py-1.5 text-center text-lg font-semibold"
                           />
-                          <button
-                            type="button"
-                            onClick={() => setStrokeAt(i, (strokes[i] ?? 8) + 1)}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-lg ring-1 ring-gray-200"
-                          >
+                          <button type="button" className="nf-stroke-btn" onClick={() => setStrokeAt(i, (strokes[i] ?? 8) + 1)}>
                             +
                           </button>
                         </div>
@@ -144,13 +129,13 @@ export default function SeongmyungApp() {
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-gray-400">한자 획수를 모르면 기본값(한글 추정)으로 분석됩니다. 정확한 풀이는 한자 획수를 맞춰 주세요.</p>
+                <p className="text-xs text-white/30">한자 획수를 모르면 추정값으로 분석됩니다.</p>
               </motion.div>
             )}
 
             <div>
-              <label htmlFor="birth" className="block text-sm font-medium text-gray-700">
-                생년 (선택 · 자원오행)
+              <label htmlFor="birth" className="nf-label">
+                생년 (선택)
               </label>
               <input
                 id="birth"
@@ -161,30 +146,21 @@ export default function SeongmyungApp() {
                 max={2100}
                 value={birthYear}
                 onChange={(e) => setBirthYear(e.target.value.slice(0, 4))}
-                className="mt-2 w-full rounded-2xl border-0 bg-gray-50 px-5 py-3 text-lg text-gray-900 ring-1 ring-gray-200 outline-none focus:ring-2 focus:ring-gray-900"
+                className="nf-input mt-2 px-5 py-3 text-lg"
               />
             </div>
 
-            {error && <p className="text-center text-sm text-rose-600">{error}</p>}
+            {error && <p className="text-center text-sm text-rose-400">{error}</p>}
 
-            <button
-              type="submit"
-              disabled={name.length < 2}
-              className="w-full rounded-2xl bg-gray-900 py-4 text-base font-semibold text-white transition hover:bg-gray-800 disabled:opacity-40"
-            >
-              이름 역학 풀이하기
+            <button type="submit" disabled={name.length < 2} className="nf-btn">
+              운명 풀어보기
             </button>
           </motion.form>
         ) : (
-          <motion.div
-            key="result"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-6"
-          >
-            <div className="rounded-3xl bg-gray-50 p-8 text-center ring-1 ring-gray-100">
-              <p className="text-sm text-gray-400">이름 역학 분석</p>
-              <p className="mt-2 text-4xl font-bold tracking-widest text-gray-900">{result.name}</p>
+          <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
+            <div className="nf-card nf-card-highlight p-8 text-center">
+              <p className="text-sm text-violet-300/60">이름 역학 분석</p>
+              <p className="nf-title-glow mt-2 text-4xl font-bold tracking-[0.15em] text-white">{result.name}</p>
               <div className="mt-6 flex justify-center">
                 <ScoreGauge score={result.totalScore} grade={result.gradeLabel} />
               </div>
@@ -204,33 +180,26 @@ export default function SeongmyungApp() {
             <SagyeokTabs grids={result.sagyeok} />
 
             {result.birthSummary && (
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="rounded-2xl bg-blue-50/50 p-5 ring-1 ring-blue-100"
-              >
-                <h3 className="text-sm font-semibold text-gray-900">자원오행 (생년)</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">{result.birthSummary}</p>
-              </motion.div>
+              <div className="nf-card p-5">
+                <h3 className="text-sm font-semibold text-violet-200">자원오행 (생년)</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/55">{result.birthSummary}</p>
+              </div>
             )}
 
             <button
               type="button"
+              className="nf-btn-ghost"
               onClick={() => {
                 setResult(null);
                 setName("");
                 setStrokes([]);
                 setBirthYear("");
               }}
-              className="w-full rounded-2xl py-3 text-sm font-medium text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-50"
             >
-              다른 이름 분석하기
+              다른 이름 풀기
             </button>
 
-            <p className="text-center text-xs text-gray-400">
-              전통 성명학(음양·발음오행·81수리) 기반 참고용 풀이입니다.
-            </p>
+            <p className="text-center text-xs text-white/25">전통 성명학 기반 참고용 풀이입니다.</p>
           </motion.div>
         )}
       </AnimatePresence>

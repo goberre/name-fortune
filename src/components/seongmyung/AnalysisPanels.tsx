@@ -5,25 +5,17 @@ import type { GilHeung, Oheng, PronunciationOheng, StrokeSlot, YinYang } from "@
 import { OHENG_LABEL } from "@/lib/seongmyung";
 
 const OHENG_COLOR: Record<Oheng, string> = {
-  목: "bg-emerald-500",
-  화: "bg-orange-500",
-  토: "bg-amber-600",
-  금: "bg-slate-400",
-  수: "bg-blue-500",
+  목: "bg-emerald-500/90",
+  화: "bg-orange-500/90",
+  토: "bg-amber-500/90",
+  금: "bg-slate-400/90",
+  수: "bg-blue-500/90",
 };
 
 function Badge({ status }: { status: GilHeung }) {
-  const cls =
-    status === "길"
-      ? "bg-emerald-50 text-emerald-700 ring-emerald-600/20"
-      : status === "흉"
-        ? "bg-rose-50 text-rose-700 ring-rose-600/20"
-        : "bg-gray-100 text-gray-600 ring-gray-500/10";
-  return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${cls}`}>
-      {status}
-    </span>
-  );
+  if (status === "길") return <span className="nf-badge-gil">{status}</span>;
+  if (status === "흉") return <span className="nf-badge-heung">{status}</span>;
+  return <span className="nf-badge-pyeong">{status}</span>;
 }
 
 export default function AnalysisPanels({
@@ -31,7 +23,6 @@ export default function AnalysisPanels({
   yinYangPattern,
   yinYangGilHeung,
   yinYangSummary,
-  pronunciation,
   pronunciationFlow,
   pronunciationGilHeung,
   pronunciationSummary,
@@ -45,10 +36,7 @@ export default function AnalysisPanels({
   pronunciationGilHeung: GilHeung;
   pronunciationSummary: string;
 }) {
-  const card = {
-    hidden: { opacity: 0, y: 16 },
-    show: { opacity: 1, y: 0 },
-  };
+  const card = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
 
   return (
     <motion.div
@@ -57,49 +45,40 @@ export default function AnalysisPanels({
       variants={{ show: { transition: { staggerChildren: 0.08 } } }}
       className="grid gap-4 sm:grid-cols-2"
     >
-      <motion.div variants={card} className="rounded-2xl bg-gray-50 p-5 ring-1 ring-gray-100">
+      <motion.div variants={card} className="nf-card p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-900">음양(陰陽) 조화</h3>
+          <h3 className="text-sm font-semibold text-violet-200">음양 조화</h3>
           <Badge status={yinYangGilHeung} />
         </div>
         <div className="mb-3 flex flex-wrap gap-2">
           {slots.map((s, i) => (
-            <div key={s.char} className="rounded-xl bg-white px-3 py-2 text-center ring-1 ring-gray-100">
-              <p className="text-lg font-semibold text-gray-900">{s.char}</p>
-              <p className="text-[10px] text-gray-400">
+            <div key={s.char} className="rounded-lg border border-violet-500/20 bg-black/30 px-3 py-2 text-center">
+              <p className="text-lg font-semibold text-white">{s.char}</p>
+              <p className="text-[10px] text-white/40">
                 {s.strokes}획 · {yinYangPattern[i]}
               </p>
             </div>
           ))}
         </div>
-        <p className="text-sm leading-relaxed text-gray-600">{yinYangSummary}</p>
+        <p className="text-sm leading-relaxed text-white/55">{yinYangSummary}</p>
       </motion.div>
 
-      <motion.div variants={card} className="rounded-2xl bg-gray-50 p-5 ring-1 ring-gray-100">
+      <motion.div variants={card} className="nf-card p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-900">발음오행</h3>
+          <h3 className="text-sm font-semibold text-violet-200">발음오행</h3>
           <Badge status={pronunciationGilHeung} />
         </div>
         <div className="mb-3 flex flex-wrap items-center gap-1.5">
           {pronunciationFlow.map((o, i) => (
             <span key={i} className="flex items-center gap-1.5">
-              {i > 0 && <span className="text-gray-300">→</span>}
-              <span
-                className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-white ${OHENG_COLOR[o]}`}
-              >
+              {i > 0 && <span className="text-white/20">→</span>}
+              <span className={`rounded-lg px-2 py-1 text-xs font-medium text-white ${OHENG_COLOR[o]}`}>
                 {OHENG_LABEL[o]} {o}
               </span>
             </span>
           ))}
         </div>
-        <div className="mb-3 flex flex-wrap gap-2">
-          {pronunciation.map((p) => (
-            <span key={p.char} className="text-xs text-gray-500">
-              {p.char}({p.cho})={p.oheng}
-            </span>
-          ))}
-        </div>
-        <p className="text-sm leading-relaxed text-gray-600">{pronunciationSummary}</p>
+        <p className="text-sm leading-relaxed text-white/55">{pronunciationSummary}</p>
       </motion.div>
     </motion.div>
   );
