@@ -1,9 +1,9 @@
 export const siteConfig = {
   brand: "돌고래",
   name: "이름으로 풀어보자",
-  tagline: "이름만 입력하면 성격·운세·오행을 바로 확인",
+  tagline: "한글 이름과 획수로 성명학 기반 역학을 확인하세요",
   description:
-    "한글 이름으로 오행·성격·연애·재물·직업운을 무료 분석. 이름 풀이, 이름 사주, 성명학 기반. ehfrhfo.com 돌고래 — 회원가입 없음.",
+    "음양 조화, 발음오행, 81수리 원격·형격·이격·정격 분석. 한글 이름·한자 획수·생년 자원오행. 무료, ehfrhfo.com 돌고래.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://name.ehfrhfo.com",
   locale: "ko_KR",
   ogImage: "/og-image.svg",
