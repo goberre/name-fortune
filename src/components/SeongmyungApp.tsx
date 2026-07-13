@@ -459,7 +459,7 @@ export default function SeongmyungApp() {
       <AnimatePresence mode="wait" custom={direction}>
         {step === "intro" && (
           <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <IntroMusok onEnter={enterApp} onEnterCouple={enterCouple} />
+            <IntroMusok onEnter={enterApp} />
           </motion.div>
         )}
 

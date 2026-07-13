@@ -5,7 +5,6 @@ import AdSlot from "@/components/monetization/AdSlot";
 import CoupangSlot from "@/components/monetization/CoupangSlot";
 import BrushText from "@/components/musok/BrushText";
 import CoupleHarmonyGauge from "@/components/musok/CoupleHarmonyGauge";
-import PremiumPaywall from "@/components/musok/PremiumPaywall";
 import SurnameHanjaPanel from "@/components/musok/SurnameHanjaPanel";
 import { adsConfig } from "@/config/ads";
 import { gilBadgeClass } from "@/lib/compatibility-copy";
@@ -104,77 +103,73 @@ export default function CoupleMusokDashboard({
         ))}
       </motion.div>
 
-      {/* 유료 상세 */}
-      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
-        <PremiumPaywall pairScore={result.pairScore} nameA={personA.name} nameB={personB.name}>
-          <div className="space-y-6 p-2">
-            <section className="mk-card p-6">
-              <p className="mk-kicker">사주·이름 교차 조화</p>
-              <div className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--mk-ivory-dim)]">
-                <p>{result.dayRelationSummary}</p>
-                <p>{result.crossHarmonySummary}</p>
-                <p>{result.nameBridgeSummary}</p>
-                <p>{result.placeSummary}</p>
-                <p>{result.marriageWindowSummary}</p>
-              </div>
-            </section>
-
-            {result.dimensions.map((d) => (
-              <section key={`detail-${d.key}`} className="mk-card p-6">
-                <div className="flex items-center justify-between">
-                  <p className="mk-kicker">
-                    {d.hanja} {d.label}
-                  </p>
-                  <span className="text-sm text-[var(--mk-cinnabar-soft)]">{d.score}점</span>
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-[var(--mk-ivory-dim)]">{d.detail}</p>
-                <p className="mt-3 border-t border-[var(--mk-border)] pt-3 text-xs text-[var(--mk-ivory-muted)]">
-                  💡 {d.advice}
-                </p>
-              </section>
-            ))}
-
-            <section className="mk-card p-6">
-              <p className="mk-kicker">앞으로 4년 흐름</p>
-              <div className="mt-4 space-y-3">
-                {result.yearOutlook.map((y) => (
-                  <div key={y.year} className="border border-[var(--mk-border)] p-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-musok text-[var(--mk-ivory)]">{y.year}년</span>
-                      <span className={`text-[10px] ${gilBadgeClass(y.flow)} border px-2 py-0.5`}>{y.flow}</span>
-                    </div>
-                    <p className="mt-1 text-xs text-[var(--mk-cinnabar-soft)]">{y.theme}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-[var(--mk-ivory-muted)]">{y.advice}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {(result.strengths.length > 0 || result.cautions.length > 0) && (
-              <section className="mk-card p-6">
-                <p className="mk-kicker">종합 처방</p>
-                {result.strengths.length > 0 && (
-                  <ul className="mt-3 space-y-1">
-                    {result.strengths.map((s) => (
-                      <li key={s} className="text-xs text-emerald-400">
-                        + {s}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {result.cautions.length > 0 && (
-                  <ul className="mt-3 space-y-1">
-                    {result.cautions.map((c) => (
-                      <li key={c} className="text-xs text-[var(--mk-cinnabar-soft)]">
-                        · {c}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            )}
+      {/* 상세 풀이 — 결제 완료 후 진입하므로 전체 표시 */}
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="space-y-6">
+        <section className="mk-card p-6">
+          <p className="mk-kicker">사주·이름 교차 조화</p>
+          <div className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--mk-ivory-dim)]">
+            <p>{result.dayRelationSummary}</p>
+            <p>{result.crossHarmonySummary}</p>
+            <p>{result.nameBridgeSummary}</p>
+            <p>{result.placeSummary}</p>
+            <p>{result.marriageWindowSummary}</p>
           </div>
-        </PremiumPaywall>
+        </section>
+
+        {result.dimensions.map((d) => (
+          <section key={`detail-${d.key}`} className="mk-card p-6">
+            <div className="flex items-center justify-between">
+              <p className="mk-kicker">
+                {d.hanja} {d.label}
+              </p>
+              <span className="text-sm text-[var(--mk-cinnabar-soft)]">{d.score}점</span>
+            </div>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--mk-ivory-dim)]">{d.detail}</p>
+            <p className="mt-3 border-t border-[var(--mk-border)] pt-3 text-xs text-[var(--mk-ivory-muted)]">
+              💡 {d.advice}
+            </p>
+          </section>
+        ))}
+
+        <section className="mk-card p-6">
+          <p className="mk-kicker">앞으로 4년 흐름</p>
+          <div className="mt-4 space-y-3">
+            {result.yearOutlook.map((y) => (
+              <div key={y.year} className="border border-[var(--mk-border)] p-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-musok text-[var(--mk-ivory)]">{y.year}년</span>
+                  <span className={`text-[10px] ${gilBadgeClass(y.flow)} border px-2 py-0.5`}>{y.flow}</span>
+                </div>
+                <p className="mt-1 text-xs text-[var(--mk-cinnabar-soft)]">{y.theme}</p>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--mk-ivory-muted)]">{y.advice}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {(result.strengths.length > 0 || result.cautions.length > 0) && (
+          <section className="mk-card p-6">
+            <p className="mk-kicker">종합 처방</p>
+            {result.strengths.length > 0 && (
+              <ul className="mt-3 space-y-1">
+                {result.strengths.map((s) => (
+                  <li key={s} className="text-xs text-emerald-400">
+                    + {s}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {result.cautions.length > 0 && (
+              <ul className="mt-3 space-y-1">
+                {result.cautions.map((c) => (
+                  <li key={c} className="text-xs text-[var(--mk-cinnabar-soft)]">
+                    · {c}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
       </motion.div>
 
       {(adsConfig.adsenseSlotMid || adsConfig.coupangWidgetId) && (
