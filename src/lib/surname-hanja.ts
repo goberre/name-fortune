@@ -527,6 +527,52 @@ export const SURNAME_HANJA: Record<string, SurnameEntry> = {
       { hanja: "邊", meaning: "가 편", gloss: "성씨 邊(편) — 邊氏 계열" },
     ],
   },
+  엄: {
+    primary: "嚴",
+    summary: "엄할(嚴) · 영월·寧越 엄씨. 嚴(엄)씨 정통 한자.",
+    options: [
+      { hanja: "嚴", meaning: "엄할 엄", gloss: "성씨 嚴(엄) — 嚴氏, 엄격·위엄" },
+    ],
+  },
+  채: {
+    primary: "蔡",
+    summary: "거북점(蔡) · 인천·평강 채씨. 蔡(채)씨 정통 한자.",
+    options: [
+      { hanja: "蔡", meaning: "풀 이름 채", gloss: "성씨 蔡(채) — 蔡氏, 인천·평강" },
+    ],
+  },
+  류: {
+    primary: "柳",
+    summary: "버들(柳) · 류(柳)씨·劉(류)씨. 두음법칙 적용 전 원음 표기.",
+    options: [
+      { hanja: "柳", meaning: "버들 류", gloss: "성씨 柳(류/유) — 柳氏, 버들나무" },
+      { hanja: "劉", meaning: "죽일 류", gloss: "성씨 劉(류/유) — 劉氏 계열" },
+    ],
+  },
+  기: {
+    primary: "奇",
+    summary: "기이(奇) · 행주 기씨. 奇(기)씨·箕(기)씨.",
+    options: [
+      { hanja: "奇", meaning: "기이할 기", gloss: "성씨 奇(기) — 奇氏, 행주" },
+      { hanja: "箕", meaning: "키 기", gloss: "성씨 箕(기) — 箕氏 계열" },
+      { hanja: "己", meaning: "몸 기", gloss: "성씨 己(기) — 己氏 계열" },
+    ],
+  },
+  피: {
+    primary: "皮",
+    summary: "가죽(皮) · 홍천 피씨. 皮(피)씨 정통 한자.",
+    options: [
+      { hanja: "皮", meaning: "가죽 피", gloss: "성씨 皮(피) — 皮氏, 홍천" },
+    ],
+  },
+  반: {
+    primary: "潘",
+    summary: "넘칠(潘) · 거제 반씨. 潘(반)씨 정통 한자.",
+    options: [
+      { hanja: "潘", meaning: "넘칠 반", gloss: "성씨 潘(반) — 潘氏, 거제" },
+      { hanja: "班", meaning: "나눌 반", gloss: "성씨 班(반) — 班氏 계열" },
+    ],
+  },
   // 복성 구성 음절
   보: {
     primary: "甫",
@@ -554,9 +600,13 @@ export const SURNAME_HANJA: Record<string, SurnameEntry> = {
     options: [{ hanja: "東", meaning: "동녘 동", gloss: "성씨 東(동) — 東方(동방) 복성" }],
   },
   고: {
-    primary: "孤",
-    summary: "고(孤) · 독고(獨孤) 등 복성의 孤.",
-    options: [{ hanja: "孤", meaning: "홀로 고", gloss: "성씨 孤(고) — 獨孤(독고) 복성" }],
+    primary: "高",
+    summary: "높을(高) · 제주·개성 고씨. 高(고)씨 정통 한자.",
+    options: [
+      { hanja: "高", meaning: "높을 고", gloss: "성씨 高(고) — 高氏, 제주·개성·횡성" },
+      { hanja: "古", meaning: "옛 고", gloss: "성씨 古(고) — 古氏 계열" },
+      { hanja: "孤", meaning: "홀로 고", gloss: "성씨 孤(고) — 獨孤(독고) 복성 구성자" },
+    ],
   },
   궁: {
     primary: "宮",

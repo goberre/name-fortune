@@ -38,9 +38,14 @@ const CJK_COMPAT_TO_STANDARD: Record<string, string> = {
   "\uF90A": "金",
 };
 
-/** 같은 발음인데 인덱스 키가 나뉜 음절 (김 ↔ 금) */
+/**
+ * 두음법칙으로 한글 발음은 달라도 같은 한자를 공유하는 음절 쌍.
+ * 예) 이/리(李), 유/류(柳), 김/금(金) — 인덱스 key가 나뉘어 있어 runtime에서 병합.
+ */
 const READING_SYLLABLE_ALIASES: Record<string, string[]> = {
   김: ["금"],
+  이: ["리"],
+  유: ["류"],
 };
 
 export function normalizeHanjaChar(hanja: string): string {

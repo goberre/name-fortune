@@ -17,8 +17,8 @@ const OUT = join(ROOT, "public/data/hanja-index.json");
 /** CJK 호환 한자 → 표준형 */
 const CJK_COMPAT_TO_STANDARD = { "\uF90A": "金" };
 
-/** 같은 발음인데 CSV 키가 나뉜 음절 */
-const READING_SYLLABLE_ALIASES = { 김: ["금"] };
+/** 두음법칙으로 CSV 키가 나뉜 음절 — runtime 병합과 일치시킴 */
+const READING_SYLLABLE_ALIASES = { 김: ["금"], 이: ["리"], 유: ["류"] };
 
 function normalizeHanjaChar(hanja) {
   return [...hanja].map((ch) => CJK_COMPAT_TO_STANDARD[ch] ?? ch).join("");

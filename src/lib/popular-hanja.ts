@@ -85,6 +85,11 @@ export const POPULAR_BY_SYLLABLE: Record<string, string[]> = {
   형: ["形", "亨", "兄"],
   규: ["奎", "規", "圭"],
   찬: ["贊", "燦"],
+  엄: ["嚴"],
+  류: ["柳", "劉", "瑠", "琉"],
+  기: ["奇", "箕", "己"],
+  피: ["皮"],
+  반: ["潘", "班"],
 };
 
 export const GLOBAL_POPULAR = new Set([
