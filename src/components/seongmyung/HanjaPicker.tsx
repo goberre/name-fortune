@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import {
   getHanjaCandidates,
+  HANJA_SEARCH_KEYWORDS,
   isPopularHanja,
   type HanjaCandidate,
   type HanjaSelection,
@@ -96,7 +97,23 @@ export default function HanjaPicker({
   const filtered = useMemo(() => {
     const q = query.trim();
     if (!q) return candidates;
-    return candidates.filter((c) => c.hanja.includes(q) || c.meaning.includes(q));
+
+    // 한국어 조사·어미를 제거한 어간으로 재검색 (높은→높, 빛나는→빛나, 번성하는→번성하)
+    const KO_ENDINGS = /[을를은는이가의도에서며아어]$/;
+    const stem = q.length >= 2 ? q.replace(KO_ENDINGS, "") : "";
+
+    return candidates.filter((c) => {
+      if (c.hanja.includes(q) || c.meaning.includes(q)) return true;
+      // 어간 매칭 (높은→높, 빛나는→빛나)
+      if (stem && stem !== q && stem.length >= 1 && c.meaning.includes(stem)) return true;
+      // 확장 키워드 매칭 (아름다운→美·麗, 뛰어난→俊·秀 등)
+      const kw = HANJA_SEARCH_KEYWORDS[c.hanja];
+      if (kw) {
+        if (kw.includes(q)) return true;
+        if (stem && stem !== q && kw.includes(stem)) return true;
+      }
+      return false;
+    });
   }, [candidates, query]);
 
   const visibleLimit = isSurname ? 12 : 8;
