@@ -212,16 +212,6 @@ export default function SeongmyungApp() {
     goTo(1, 1);
   }
 
-  function enterCouple() {
-    setMode("couple");
-    setError("");
-    setResult(null);
-    setCoupleResult(null);
-    setPartnerName("");
-    setPartnerHanjaSelections([]);
-    goTo(1, 1);
-  }
-
   function startCoupleFromResult() {
     setMode("couple");
     setError("");
