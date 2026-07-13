@@ -33,6 +33,20 @@ let cache: HanjaIndexMeta | null = null;
 let loadPromise: Promise<HanjaIndexMeta> | null = null;
 const candidateCache = new Map<string, HanjaCandidate[]>();
 
+/** CJK 호환 한자 → 표준형 (네이버 CSV의 金 등) */
+const CJK_COMPAT_TO_STANDARD: Record<string, string> = {
+  "\uF90A": "金",
+};
+
+/** 같은 발음인데 인덱스 키가 나뉜 음절 (김 ↔ 금) */
+const READING_SYLLABLE_ALIASES: Record<string, string[]> = {
+  김: ["금"],
+};
+
+export function normalizeHanjaChar(hanja: string): string {
+  return [...hanja].map((ch) => CJK_COMPAT_TO_STANDARD[ch] ?? ch).join("");
+}
+
 /** 자원오행 추론 — 부수·키워드 기반 (성명학 참고용) */
 const HANJA_OHENG: Record<string, Oheng> = {
   金: "금", 銀: "금", 鐵: "금", 銅: "금", 鋼: "금", 錢: "금", 玉: "금", 珠: "금", 珍: "금",
@@ -66,11 +80,31 @@ export function inferOheng(hanja: string, meaning: string): Oheng {
 }
 
 function enrich(entry: RawEntry): HanjaCandidate {
+  const hanja = normalizeHanjaChar(entry.hanja);
   return {
-    ...entry,
-    oheng: inferOheng(entry.hanja, entry.meaning),
-    wonStrokes: getWonhyeokStrokes(entry.hanja),
+    hanja,
+    meaning: entry.meaning,
+    oheng: inferOheng(hanja, entry.meaning),
+    wonStrokes: getWonhyeokStrokes(hanja),
   };
+}
+
+function collectRawEntries(data: HanjaIndexMeta, hangul: string): RawEntry[] {
+  const keys = [hangul, ...(READING_SYLLABLE_ALIASES[hangul] ?? [])];
+  const byHanja = new Map<string, RawEntry>();
+
+  for (const key of keys) {
+    for (const entry of data.index[key] ?? []) {
+      const hanja = normalizeHanjaChar(entry.hanja);
+      const normalized = { hanja, meaning: entry.meaning };
+      const existing = byHanja.get(hanja);
+      if (!existing || key === hangul) {
+        byHanja.set(hanja, normalized);
+      }
+    }
+  }
+
+  return [...byHanja.values()];
 }
 
 export async function loadHanjaIndex(): Promise<HanjaIndexMeta> {
@@ -122,7 +156,7 @@ export async function getHanjaCandidates(
   if (cached) return cached;
 
   const data = await loadHanjaIndex();
-  const raw = data.index[hangul] ?? [];
+  const raw = collectRawEntries(data, hangul);
   let result = sortCandidates(hangul, raw.map(enrich));
   if (asSurname) {
     result = mergeSurnameCandidates(hangul, result);
@@ -168,7 +202,7 @@ export { isPopularHanja };
 
 export async function hasHanjaData(hangul: string): Promise<boolean> {
   const data = await loadHanjaIndex();
-  return (data.index[hangul]?.length ?? 0) > 0;
+  return collectRawEntries(data, hangul).length > 0;
 }
 
 export function buildSelection(hangul: string, candidate: HanjaCandidate): HanjaSelection {

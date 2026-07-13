@@ -99,8 +99,9 @@ export default function HanjaPicker({
     return candidates.filter((c) => c.hanja.includes(q) || c.meaning.includes(q));
   }, [candidates, query]);
 
-  const visible = expanded ? filtered : filtered.slice(0, 8);
-  const hasMore = filtered.length > 8;
+  const visibleLimit = isSurname ? 12 : 8;
+  const visible = expanded ? filtered : filtered.slice(0, visibleLimit);
+  const hasMore = filtered.length > visibleLimit;
 
   const selectedGloss =
     isSurname && selected ? getSurnameGloss(hangul, selected.hanja) : undefined;
@@ -267,7 +268,7 @@ export default function HanjaPicker({
 
           {hasMore && !expanded && (
             <button type="button" onClick={() => setExpanded(true)} className={`mt-3 w-full py-3 text-sm min-h-[44px] ${musok ? "mk-btn mk-btn-ghost" : "text-neutral-500"}`}>
-              {filtered.length - 8}개 더 보기
+              {filtered.length - visibleLimit}개 더 보기
             </button>
           )}
           {expanded && hasMore && (

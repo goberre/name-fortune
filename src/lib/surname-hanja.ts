@@ -21,6 +21,7 @@ export const SURNAME_HANJA: Record<string, SurnameEntry> = {
     options: [
       { hanja: "金", meaning: "쇠 금", gloss: "성씨 金(김) — 금·쇠에서 유래한 대표 김씨 한자" },
       { hanja: "琴", meaning: "거문고 금", gloss: "성씨 琴(김) — 거문고(琴)에서 유래한 김씨 파" },
+      { hanja: "錦", meaning: "비단 금", gloss: "성씨 錦(김) — 錦綉·錦城 등 김씨 파" },
     ],
   },
   이: {

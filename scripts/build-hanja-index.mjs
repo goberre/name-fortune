@@ -3,7 +3,7 @@
  * 네이버 인명용 한자 CSV → 음절별 JSON 인덱스 생성
  * 출처: https://github.com/rutopio/Korean-Name-Hanja-Charset (data-naver.csv)
  */
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -11,7 +11,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const CSV_URL =
   "https://raw.githubusercontent.com/rutopio/Korean-Name-Hanja-Charset/main/data-naver.csv";
+const LOCAL_CSV = join(ROOT, "data-naver.csv");
 const OUT = join(ROOT, "public/data/hanja-index.json");
+
+/** CJK 호환 한자 → 표준형 */
+const CJK_COMPAT_TO_STANDARD = { "\uF90A": "金" };
+
+/** 같은 발음인데 CSV 키가 나뉜 음절 */
+const READING_SYLLABLE_ALIASES = { 김: ["금"] };
+
+function normalizeHanjaChar(hanja) {
+  return [...hanja].map((ch) => CJK_COMPAT_TO_STANDARD[ch] ?? ch).join("");
+}
 
 function parseCsvLine(line) {
   const parts = [];
@@ -42,10 +53,16 @@ function cleanMeaning(raw) {
 }
 
 async function main() {
-  console.log("Downloading name hanja CSV...");
-  const res = await fetch(CSV_URL);
-  if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-  const text = await res.text();
+  let text;
+  try {
+    text = await readFile(LOCAL_CSV, "utf8");
+    console.log("Using local CSV:", LOCAL_CSV);
+  } catch {
+    console.log("Downloading name hanja CSV...");
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+    text = await res.text();
+  }
   const lines = text.split("\n").slice(1);
 
   /** @type {Record<string, { hanja: string; meaning: string }[]>} */
@@ -57,9 +74,23 @@ async function main() {
     if (!hangul || !hanja || !meaning) continue;
     if (!index[hangul]) index[hangul] = [];
     const cleaned = cleanMeaning(meaning);
-    const dup = index[hangul].some((e) => e.hanja === hanja);
+    const normalizedHanja = normalizeHanjaChar(hanja);
+    const dup = index[hangul].some((e) => normalizeHanjaChar(e.hanja) === normalizedHanja);
     if (!dup) {
-      index[hangul].push({ hanja, meaning: cleaned });
+      index[hangul].push({ hanja: normalizedHanja, meaning: cleaned });
+    }
+  }
+
+  for (const [target, aliases] of Object.entries(READING_SYLLABLE_ALIASES)) {
+    if (!index[target]) index[target] = [];
+    const seen = new Set(index[target].map((e) => normalizeHanjaChar(e.hanja)));
+    for (const alias of aliases) {
+      for (const entry of index[alias] ?? []) {
+        const hanja = normalizeHanjaChar(entry.hanja);
+        if (seen.has(hanja)) continue;
+        index[target].push({ hanja, meaning: entry.meaning });
+        seen.add(hanja);
+      }
     }
   }
 
@@ -85,6 +116,7 @@ async function main() {
   console.log(`  entries:   ${meta.entryCount}`);
   console.log(`  고: ${index["고"]?.length ?? 0} candidates`);
   console.log(`  필: ${index["필"]?.length ?? 0} candidates`);
+  console.log(`  김: ${index["김"]?.length ?? 0} candidates`);
 }
 
 main().catch((e) => {
